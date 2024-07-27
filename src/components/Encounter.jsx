@@ -3,16 +3,27 @@ import Combatant from "./Combatant";
 function Encounter(){
     const [round, setRound] = useState(1); //encounter round
     const [currentIdx, setCurrentIdx] = useState(0); //current initiative in round
-    const combatants = [{name: "Taylor", maxHP: 100, isPC: true, currentHP: 100}, {name: "Karisa", maxHP: 50, isPC: true, currentHP: 50}, {name: "Bugbear", maxHP: 200, isPC: false, currentHP: 50}];
-    const memoizedCombatants = combatants.map((combatant, i) => <Combatant key={i} combatantName={combatant.name}/>);
 
-    const [stateCombatants, setStateCombatants] = useState(memoizedCombatants);
-    const [delayedCombatants, setDelayedCombatants] = useState([]);
 
+    const players = [
+        {name: "Taylor", maxHP: 100, isPC: true, currentHP: 100, int: 20}, 
+        {name: "Karisa", maxHP: 50, isPC: true, currentHP: 50, int: 21}, 
+        {name: "Bugbear", maxHP: 200, isPC: false, currentHP: 50, int: 5}
+    ];
+    players.sort((a, b)=> b.int - a.int);
+    players.forEach((combatant, i) =>{
+       combatant.ord = i;
+       combatant.id = i; 
+    } );
+    const playerObj = Object.assign({}, players)
+    // const memoizedCombatants = combatants.map((combatant, i) => <Combatant key={i} ord={i} combatantName={combatant.name}/>);
+    const [combatantCount, setCombatantCount] = useState(players.length);
+    const [combatants, setCombatants] = useState(playerObj);
+    const [delayedCombatants, setDelayedCombatants] = useState({});
 
     function handleNext(){
         let newIdx = currentIdx + 1;
-        if(newIdx >= stateCombatants.length){
+        if(newIdx >= combatantCount){
             newIdx = 0;
             setRound(round + 1);
         }
@@ -22,50 +33,61 @@ function Encounter(){
     function handlePrevious(){
         let newIdx = currentIdx - 1;
         if(newIdx < 0){
-            newIdx = stateCombatants.length - 1;
+            newIdx = combatantCount - 1;
             setRound(round - 1);
         }
         setCurrentIdx(newIdx);
     }
-    function handleDelay(idx){
-        if(idx === stateCombatants.length - 1){
+    function handleDelay(ord, id){
+        if(ord === combatantCount - 1){
             setRound(round + 1);
             setCurrentIdx(0);
         }
-        setDelayedCombatants((prev) =>[...prev, stateCombatants[idx]]);
-        setStateCombatants((prev) => prev.slice(0, idx).concat(prev.slice(idx + 1)));
+        setCombatantCount(combatantCount - 1);
+        setDelayedCombatants({...delayedCombatants, [id]: combatants[id]});
+        // setStateCombatants((prev) => prev.slice(0, idx).concat(prev.slice(idx + 1)));
+        const otherCombatants = Object.assign({}, combatants);
+        delete otherCombatants[id];
+        setCombatants(otherCombatants)
     }
-    function handleUndelay(idx){
-        setStateCombatants((prev) => prev.slice(0, currentIdx).concat(delayedCombatants[idx], prev.slice(currentIdx)));
-        setDelayedCombatants((prev) => prev.slice(0, idx).concat(prev.slice(idx + 1))); //remove from delayed
+    function handleUndelay(id){
+        setCombatantCount(combatantCount + 1);
+        setCombatants({...combatants, [id]: {...combatants[id], ord: }}) //set delay to false
+        // setStateCombatants((prev) => prev.slice(0, currentIdx).concat(delayedCombatants[idx], prev.slice(currentIdx)));
+        // setDelayedCombatants((prev) => prev.slice(0, idx).concat(prev.slice(idx + 1))); //remove from delayed
+        const otherDelayedCombatants = Object.assign({}, delayedCombatants);
+        delete otherDelayedCombatants[id];
+        setDelayedCombatants(otherDelayedCombatants);
     }
     function handleUp(idx){
-        setStateCombatants((prev) => prev.slice(0, idx - 1).concat(stateCombatants[idx], stateCombatants[idx - 1], prev.slice(idx + 1)));
+        // setStateCombatants((prev) => prev.slice(0, idx - 1).concat(stateCombatants[idx], stateCombatants[idx - 1], prev.slice(idx + 1)));
     }
     function handleDown(idx){
-        setStateCombatants((prev) => prev.slice(0, idx).concat(stateCombatants[idx + 1], stateCombatants[idx], prev.slice(idx + 2)));
+        // setStateCombatants((prev) => prev.slice(0, idx).concat(stateCombatants[idx + 1], stateCombatants[idx], prev.slice(idx + 2)));
     }
-
+    console.log(combatants)
+    console.log(delayedCombatants)
     return(
         <>
-            {delayedCombatants.map((delayedC, i)=> {
+            {Object.values(delayedCombatants).map((combatant, i)=> {
+                console.log(combatant)
                 return(
-                    <div key={i}>
-                        {delayedC}
-                        <button onClick={() => handleUndelay(i)}>Act Now?</button>
+                    <div key={combatant.id}>
+                        <Combatant key={combatant.id} combatant={combatant}/>
+                        <button onClick={() => handleUndelay(combatant.id)}>Act Now?</button>
                     </div>
                 )
             })}
             <h1>Round {round}</h1>
-            {stateCombatants.map((combatant, i) => {
+            {Object.values(combatants).filter((combatant)=> !combatant.delay).map((combatant, i) => {
                 const isCurrent = currentIdx === i
                 return(
-                    <div key={i}>
+                    <div key={combatant.id}>
                         {isCurrent && <strong>{'--> '}</strong>}
-                        {combatant}
+                        <Combatant key={combatant.id} combatant={combatant} combatants={combatants} setCombatants={setCombatants}/>
                         <button onClick={() => handleUp(i)} disabled={i === 0}>Up</button>
-                        <button onClick={() => handleDown(i)} disabled={i === stateCombatants.length - 1}>Down</button>
-                        {isCurrent && <button onClick={() => handleDelay(i)}>Delay?</button>}
+                        <button onClick={() => handleDown(i)} disabled={i === combatantCount - 1}>Down</button>
+                        {isCurrent && <button onClick={() => handleDelay(combatant.ord, combatant.id)}>Delay?</button>}
                     </div>
                 ) 
             })}

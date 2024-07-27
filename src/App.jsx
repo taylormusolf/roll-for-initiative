@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import './App.css';
-import Encounter from './components/Encounter';
+import Encounter from './components/Encounter2';
 
 function App() {
   

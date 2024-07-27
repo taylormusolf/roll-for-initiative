@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 
 
-const Combatant = ({combatantName, isCurrent, isPC, maxHP, currentHP, combatants, setCombatants}) => {
+const Combatant = ({combatant, isCurrent, isPC, maxHP, currentHP, combatants, setCombatants}) => {
     const [hp, setHp] = useState(100);
     const [maxHp, setMaxHp] = useState(maxHP);
-    const [characterName, setCharacterName] = useState(combatantName);
+    const [characterName, setCharacterName] = useState(combatant.name);
     const [notes, setNotes] = useState('');
 
     function handleHpIncrease(){
@@ -20,8 +20,8 @@ const Combatant = ({combatantName, isCurrent, isPC, maxHP, currentHP, combatants
     return (
         <>
             <div>
-                {/* <span>{combatantName}</span> */}
-                <span><input type="text" value={characterName} onChange={(e) => setCharacterName(e.currentTarget.value)} /></span>
+                {/* <span>{combatant.name}</span> */}
+                <span><input type="text" value={combatant.name} onChange={(e) => setCombatants({...combatants, [combatant.id]: {...combatant, name: e.currentTarget.value}})} /></span>
                 {/* <span> {hp} HP</span>
                 <span onClick={handleHpIncrease}>+ </span>
                 <span onClick={handleHpDecrease}>- </span>
