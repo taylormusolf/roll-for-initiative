@@ -1,102 +1,125 @@
-import React, { useMemo, useState,} from "react";
-import Combatant from "./Combatant";
-function Encounter(){
-    const [round, setRound] = useState(1); //encounter round
-    const [currentIdx, setCurrentIdx] = useState(0); //current initiative in round
+import React, { useState } from 'react';
+import Combatant from './Combatant';
+import PreCombatSetup from './PreCombatSetup';
 
+const Encounter = () => {
+  const [round, setRound] = useState(1);
+  // const [initiativeOrder, setInitiativeOrder] = useState([
+  //   { id: 1, name: "Taylor", maxHP: 100, isPC: true, maxHp: 100, health: 100, initiative: 20, conditions: []}, 
+  //   { id: 2, name: "Karisa", maxHP: 50, isPC: true, maxHp: 100, health: 50, initiative: 21, conditions: []}, 
+  //   { id: 3, name: "Bugbear", maxHP: 200, isPC: false, maxHp: 100, health: 50, initiative: 5, conditions: []}
+  // ]);
+  const [initiativeOrder, setInitiativeOrder] =  useState([]);
 
-    const players = [
-        {name: "Taylor", maxHP: 100, isPC: true, currentHP: 100, int: 20}, 
-        {name: "Karisa", maxHP: 50, isPC: true, currentHP: 50, int: 21}, 
-        {name: "Bugbear", maxHP: 200, isPC: false, currentHP: 50, int: 5}
-    ];
-    players.sort((a, b)=> b.int - a.int);
-    players.forEach((combatant, i) =>{
-       combatant.ord = i;
-       combatant.id = i; 
-    } );
-    const playerObj = Object.assign({}, players)
-    // const memoizedCombatants = combatants.map((combatant, i) => <Combatant key={i} ord={i} combatantName={combatant.name}/>);
-    const [combatantCount, setCombatantCount] = useState(players.length);
-    const [combatants, setCombatants] = useState(playerObj);
-    const [delayedCombatants, setDelayedCombatants] = useState({});
+  const [currentTurn, setCurrentTurn] = useState(0);
 
-    function handleNext(){
-        let newIdx = currentIdx + 1;
-        if(newIdx >= combatantCount){
-            newIdx = 0;
-            setRound(round + 1);
-        }
-        setCurrentIdx(newIdx);
-    }
+  const addCombatant = () => {
+    setInitiativeOrder([...initiativeOrder, { id: initiativeOrder.length, name: 'Player ' + (initiativeOrder.length + 1), initiative: 0, health: 100, maxHp: 100, useHealth: true, notes: '', conditions: [] }]);
+  };
+  const startEncounter = (sortedCombatants) => {
+    setInitiativeOrder(sortedCombatants);
+    setRound(1);
+    setCurrentTurn(0);
+  };
 
-    function handlePrevious(){
-        let newIdx = currentIdx - 1;
-        if(newIdx < 0){
-            newIdx = combatantCount - 1;
-            setRound(round - 1);
-        }
-        setCurrentIdx(newIdx);
+  const nextTurn = () => {
+    const newOrder = [...initiativeOrder];
+    const currentCombatant = newOrder[currentTurn];
+    currentCombatant.conditions = currentCombatant.conditions.map(condition => {
+      if (condition.name === 'Frightened' && condition.value > 0) {
+        return { ...condition, value: condition.value - 1 };
+      }
+      return condition;
+    });
+    setInitiativeOrder(newOrder);
+    setCurrentTurn((currentTurn + 1) % initiativeOrder.length);
+    if (currentTurn === initiativeOrder.length - 1) {
+      setRound(round + 1);
     }
-    function handleDelay(ord, id){
-        if(ord === combatantCount - 1){
-            setRound(round + 1);
-            setCurrentIdx(0);
-        }
-        setCombatantCount(combatantCount - 1);
-        setDelayedCombatants({...delayedCombatants, [id]: combatants[id]});
-        // setStateCombatants((prev) => prev.slice(0, idx).concat(prev.slice(idx + 1)));
-        const otherCombatants = Object.assign({}, combatants);
-        delete otherCombatants[id];
-        setCombatants(otherCombatants)
-    }
-    function handleUndelay(id){
-        setCombatantCount(combatantCount + 1);
-        setCombatants({...combatants, [id]: {...combatants[id], ord: }}) //set delay to false
-        // setStateCombatants((prev) => prev.slice(0, currentIdx).concat(delayedCombatants[idx], prev.slice(currentIdx)));
-        // setDelayedCombatants((prev) => prev.slice(0, idx).concat(prev.slice(idx + 1))); //remove from delayed
-        const otherDelayedCombatants = Object.assign({}, delayedCombatants);
-        delete otherDelayedCombatants[id];
-        setDelayedCombatants(otherDelayedCombatants);
-    }
-    function handleUp(idx){
-        // setStateCombatants((prev) => prev.slice(0, idx - 1).concat(stateCombatants[idx], stateCombatants[idx - 1], prev.slice(idx + 1)));
-    }
-    function handleDown(idx){
-        // setStateCombatants((prev) => prev.slice(0, idx).concat(stateCombatants[idx + 1], stateCombatants[idx], prev.slice(idx + 2)));
-    }
-    console.log(combatants)
-    console.log(delayedCombatants)
-    return(
-        <>
-            {Object.values(delayedCombatants).map((combatant, i)=> {
-                console.log(combatant)
-                return(
-                    <div key={combatant.id}>
-                        <Combatant key={combatant.id} combatant={combatant}/>
-                        <button onClick={() => handleUndelay(combatant.id)}>Act Now?</button>
-                    </div>
-                )
-            })}
-            <h1>Round {round}</h1>
-            {Object.values(combatants).filter((combatant)=> !combatant.delay).map((combatant, i) => {
-                const isCurrent = currentIdx === i
-                return(
-                    <div key={combatant.id}>
-                        {isCurrent && <strong>{'--> '}</strong>}
-                        <Combatant key={combatant.id} combatant={combatant} combatants={combatants} setCombatants={setCombatants}/>
-                        <button onClick={() => handleUp(i)} disabled={i === 0}>Up</button>
-                        <button onClick={() => handleDown(i)} disabled={i === combatantCount - 1}>Down</button>
-                        {isCurrent && <button onClick={() => handleDelay(combatant.ord, combatant.id)}>Delay?</button>}
-                    </div>
-                ) 
-            })}
-            <button onClick={handlePrevious} disabled={round === 1 && currentIdx === 0} >Previous</button>
-            <button onClick={handleNext}>Next</button>
-        </>
-    )
+  };
 
-}
+  const prevTurn = () => {
+    setCurrentTurn((currentTurn - 1 + initiativeOrder.length) % initiativeOrder.length);
+    if (currentTurn === 0) {
+      setRound(round - 1);
+    }
+  };
 
+  const moveUp = (id) => {
+    const index = initiativeOrder.findIndex(c => c.id === id);
+    if (index > 0) {
+      const newOrder = [...initiativeOrder];
+      [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
+      setInitiativeOrder(newOrder);
+    }
+  };
+
+  const moveDown = (id) => {
+    const index = initiativeOrder.findIndex(c => c.id === id);
+    if (index < initiativeOrder.length - 1) {
+      const newOrder = [...initiativeOrder];
+      [newOrder[index + 1], newOrder[index]] = [newOrder[index], newOrder[index + 1]];
+      setInitiativeOrder(newOrder);
+    }
+  };
+
+  const updateHealth = (id, newHealth) => {
+    const newOrder = initiativeOrder.map(combatant =>
+      combatant.id === id ? { ...combatant, health: newHealth } : combatant
+    );
+    setInitiativeOrder(newOrder);
+  };
+
+  const updateName = (id, newName) => {
+    const newOrder = initiativeOrder.map(combatant =>
+      combatant.id === id ? { ...combatant, name: newName } : combatant
+    );
+    setInitiativeOrder(newOrder);
+  };
+
+  const updateConditions = (id, conditions) => {
+    const newOrder = initiativeOrder.map(combatant =>
+      combatant.id === id ? { ...combatant, conditions } : combatant
+    );
+    setInitiativeOrder(newOrder);
+  };
+
+  const removeCombatant = (index) => {
+    const updatedCombatants = initiativeOrder.filter((_, i) => i !== index);
+    setInitiativeOrder(updatedCombatants);
+    if (current >= updatedCombatants.length) {
+      setCurrent(updatedCombatants.length - 1);
+    }
+  };
+
+  //end combat function to go back to main menu again
+
+  return (
+    <div>
+      {!initiativeOrder.length && <PreCombatSetup startEncounter={startEncounter} />}
+      {!!initiativeOrder.length && (
+        <div>
+          <h2>Round: {round}</h2>
+          <button onClick={prevTurn}>Previous</button>
+          <button onClick={nextTurn}>Next</button>
+          {initiativeOrder.map((combatant, index) => (
+            <Combatant
+              key={combatant.id}
+              {...combatant}
+              isCurrent={index === currentTurn}
+              moveUp={moveUp}
+              moveDown={moveDown}
+              updateHealth={updateHealth}
+              updateName={updateName}
+              updateConditions={updateConditions}
+              removeCombatant={removeCombatant}
+            />
+          ))}
+          <button onClick={addCombatant}>Add Combatant</button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default Encounter;
