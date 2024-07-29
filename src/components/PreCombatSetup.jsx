@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { generateRandomNumber } from '../util/random';
+import Encounter from './Encounter';
+import { EncounterContext } from '../context/EncounterContext';
 
-const PreCombatSetup = ({ startEncounter }) => {
-  const [combatants, setCombatants] = useState([]);
+const PreCombatSetup = ({ startEncounter, combatants, setCombatants, setIsPreCombat }) => {
+//   const [combatants, setCombatants] = useState([]);
+  const { encounters, updateEncounter, encountersPulled } = useContext(EncounterContext);
 
   const addCombatant = () => {
     setCombatants([...combatants, { id: combatants.length, name: 'Player ' + (combatants.length + 1), initiative: 0, health: 100, maxHp: 100, useHealth: true, notes: '',conditions: [] }]);
@@ -70,7 +73,7 @@ const PreCombatSetup = ({ startEncounter }) => {
         </div>
       ))}
       <button onClick={addCombatant}>Add Combatant</button>
-      <button onClick={handleStart} disabled={combatants.length === 0}>
+      <button onClick={()=>setIsPreCombat(false)} disabled={combatants.length === 0}>
         Start Encounter
       </button>
     </div>

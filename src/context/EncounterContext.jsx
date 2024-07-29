@@ -16,7 +16,6 @@ const EncounterProvider = ({ children }) => {
   
   // Save encounters to local storage
   useEffect(() => {
-    console.log('update')
     if(didMount.current){ //makes useEffect calls to update local storage wait until at least second render
       localStorage.setItem('encounters', JSON.stringify(encounters));
       setEncountersPulled(true);
@@ -25,14 +24,14 @@ const EncounterProvider = ({ children }) => {
     }
   }, [encounters]);
 
-  const addEncounter = () => {
-    const newEncounter = { id: Date.now(), combatants: [] };
+  const addEncounter = (name) => {
+    const newEncounter = { id: Date.now(), name: name || new Date().toLocaleString(), combatants: [] };
     setEncounters([...encounters, newEncounter]);
   };
 
-  const updateEncounter = (id, updatedCombatants) => {
+  const updateEncounter = (id, updatedCombatants, isPreCombat) => {
     setEncounters(encounters.map(enc =>
-      enc.id === id ? { ...enc, combatants: updatedCombatants } : enc
+      enc.id === id ? { ...enc, combatants: updatedCombatants, isPreCombat } : enc
     ));
   };
 
