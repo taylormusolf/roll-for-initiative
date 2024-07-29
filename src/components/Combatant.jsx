@@ -72,7 +72,8 @@ const Combatant = ({
     if (existingCondition) {
       updateConditions(id, conditions.filter((condition) => condition.name !== conditionName));
     } else {
-      updateConditions(id, [...conditions, { name: conditionName, value: conditionName === 'Frightened' ? 1 : null }]);
+      const conditionsWithValues = ['Clumsy', 'Doomed', 'Drained', 'Dying', 'Frightened','Enfeebled', 'Persistant Damage', 'Slowed', 'Stunned','Wounded,']
+      updateConditions(id, [...conditions, { name: conditionName, value: conditionsWithValues.includes(conditionName) ? 1 : null }]);
     }
   };
 
@@ -117,7 +118,7 @@ const Combatant = ({
               placeholder="+/-"
               style={{ width: '50px' }}
             />
-            <button onClick={adjustHealth}>Set</button>
+            <button onClick={adjustHealth}>Adjust</button>
           </div>
         </>
       )}
@@ -141,33 +142,32 @@ const Combatant = ({
       >
         <h2>Conditions</h2>
         <button onClick={() => toggleCondition('Blinded')}>Blinded</button>
-        <button onClick={() => toggleCondition('Broken')}>Broken</button>
+        {/* <button onClick={() => toggleCondition('Broken')}>Broken</button> */}
         <button onClick={() => toggleCondition('Clumsy')}>Clumsy</button>
-        <button onClick={() => toggleCondition('Concealed')}>Concealed</button>
+        {/* <button onClick={() => toggleCondition('Concealed')}>Concealed</button> */}
         <button onClick={() => toggleCondition('Confused')}>Confused</button>
-        <button onClick={() => toggleCondition('Controlled')}>ontrolled</button>
+        {/* <button onClick={() => toggleCondition('Controlled')}>ontrolled</button> */}
         <button onClick={() => toggleCondition('Dazzled')}>Dazzled</button>
         <button onClick={() => toggleCondition('Deafened')}>Deafened</button>
         <button onClick={() => toggleCondition('Delayed')}>Delayed</button>
         <button onClick={() => toggleCondition('Doomed')}>Doomed</button>
         <button onClick={() => toggleCondition('Drained')}>Drained</button>
-        <button onClick={() => toggleCondition('Enfeebled')}>Enfeebled</button>
         <button onClick={() => toggleCondition('Dying')}>Dying</button>
-        <button onClick={() => toggleCondition('Encumbered')}>Encumbered</button>
+        {/* <button onClick={() => toggleCondition('Encumbered')}>Encumbered</button> */}
         <button onClick={() => toggleCondition('Enfeebled')}>Enfeebled</button>
         <button onClick={() => toggleCondition('Fascinated')}>Fascinated</button>
         <button onClick={() => toggleCondition('Fatigued')}>Fatigued</button>
         <button onClick={() => toggleCondition('Fleeing')}>Fleeing</button>
-        <button onClick={() => toggleCondition('Friendly')}>Friendly</button>
+        {/* <button onClick={() => toggleCondition('Friendly')}>Friendly</button> */}
         <button onClick={() => toggleCondition('Frightened')}>Frightened</button>
         <button onClick={() => toggleCondition('Grabbed')}>Grabbed</button>
-        <button onClick={() => toggleCondition('Helpful')}>Helpful</button>
-        <button onClick={() => toggleCondition('Hidden')}>Hidden</button>
-        <button onClick={() => toggleCondition('Hostile')}>Hostile</button>
+        {/* <button onClick={() => toggleCondition('Helpful')}>Helpful</button> */}
+        {/* <button onClick={() => toggleCondition('Hidden')}>Hidden</button> */}
+        {/* <button onClick={() => toggleCondition('Hostile')}>Hostile</button> */}
         <button onClick={() => toggleCondition('Immobilized')}>Immobilized</button>
         <button onClick={() => toggleCondition('Indifferent')}>Indifferent</button>
         <button onClick={() => toggleCondition('Invisible')}>Invisible</button>
-        <button onClick={() => toggleCondition('Observed')}>Observed</button>
+        {/* <button onClick={() => toggleCondition('Observed')}>Observed</button> */}
         <button onClick={() => toggleCondition('Off-Guard')}>Off-Guard</button>
         <button onClick={() => toggleCondition('Paralyzed')}>Paralyzed</button>
         <button onClick={() => toggleCondition('Persistent Damage')}>Persistent Damage</button>
@@ -180,9 +180,9 @@ const Combatant = ({
         <button onClick={() => toggleCondition('Stunned')}>Stunned</button>
         <button onClick={() => toggleCondition('Stupefied')}>Stupefied</button>
         <button onClick={() => toggleCondition('Unconscious')}>Unconscious</button>
-        <button onClick={() => toggleCondition('Undetected')}>Undetected</button>
-        <button onClick={() => toggleCondition('Unfriendly')}>Unfriendly</button>
-        <button onClick={() => toggleCondition('Unnoticed')}>Unnoticed</button>
+        {/* <button onClick={() => toggleCondition('Undetected')}>Undetected</button> */}
+        {/* <button onClick={() => toggleCondition('Unfriendly')}>Unfriendly</button> */}
+        {/* <button onClick={() => toggleCondition('Unnoticed')}>Unnoticed</button> */}
         <button onClick={() => toggleCondition('Wounded')}>Wounded</button>
         <button onClick={() => toggleCondition('Special 1')}>Special 1</button>
         <button onClick={() => toggleCondition('Special 2')}>Special 2</button>

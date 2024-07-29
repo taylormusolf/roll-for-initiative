@@ -1,17 +1,35 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { EncounterContext } from '../context/EncounterContext';
 import Combatant from './Combatant';
 import PreCombatSetup from './PreCombatSetup';
 
 const Encounter = () => {
+  const { id } = useParams();
+  const { encounters, updateEncounter, encountersPulled } = useContext(EncounterContext);
   const [round, setRound] = useState(1);
+  const [initiativeOrder, setInitiativeOrder] =  useState([]);
+  const [currentTurn, setCurrentTurn] = useState(0);
   // const [initiativeOrder, setInitiativeOrder] = useState([
   //   { id: 1, name: "Taylor", maxHP: 100, isPC: true, maxHp: 100, health: 100, initiative: 20, conditions: []}, 
   //   { id: 2, name: "Karisa", maxHP: 50, isPC: true, maxHp: 100, health: 50, initiative: 21, conditions: []}, 
   //   { id: 3, name: "Bugbear", maxHP: 200, isPC: false, maxHp: 100, health: 50, initiative: 5, conditions: []}
   // ]);
-  const [initiativeOrder, setInitiativeOrder] =  useState([]);
+  
+  useEffect(() => {
+    if(encountersPulled){
+      const encounter = encounters.find(enc => enc.id === Number(id));
+      if (encounter) {
+        setInitiativeOrder(encounter.combatants);
+      }
+    }
+  }, [id, encountersPulled]);
 
-  const [currentTurn, setCurrentTurn] = useState(0);
+  useEffect(() => {
+    console.log('encounter update')
+    updateEncounter(Number(id), initiativeOrder);
+  }, [id, initiativeOrder]);
+
 
   const addCombatant = () => {
     setInitiativeOrder([...initiativeOrder, { id: initiativeOrder.length, name: 'Player ' + (initiativeOrder.length + 1), initiative: 0, health: 100, maxHp: 100, useHealth: true, notes: '', conditions: [] }]);
@@ -90,14 +108,17 @@ const Encounter = () => {
     if (current >= updatedCombatants.length) {
       setCurrent(updatedCombatants.length - 1);
     }
+    // updateEncounter(Number(id), updatedCombatants);
   };
 
   //end combat function to go back to main menu again
 
   return (
     <div>
-      {!initiativeOrder.length && <PreCombatSetup startEncounter={startEncounter} />}
-      {!!initiativeOrder.length && (
+      <Link to="/">Back to Manager</Link>
+      {!initiativeOrder.length ? (
+        <PreCombatSetup startEncounter={startEncounter} />
+      ): (
         <div>
           <h2>Round: {round}</h2>
           <button onClick={prevTurn}>Previous</button>
@@ -117,6 +138,7 @@ const Encounter = () => {
           ))}
           <button onClick={addCombatant}>Add Combatant</button>
         </div>
+
       )}
     </div>
   );
