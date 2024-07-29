@@ -114,6 +114,7 @@ const Encounter = () => {
 
   const endEncounter = () => {
     setIsPreCombat(true);
+    updateEncounter(Number(id), initiativeOrder, true);
   };
 
   return (
