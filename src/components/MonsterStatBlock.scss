@@ -23,12 +23,15 @@
       font-weight: 700;
     }
   }
+  .misc-stats, .defense{
+    border-bottom: 1px solid;
+  }
   
-  .perception, .languages, .skills, .abilities-list, .traits{
+  .perception, .languages, .skills, .abilities-list, .traits, .items, .special, .resistances, .defense-top-line, .weaknesses, .offense{
     display: flex;
     padding-top:5px;
   }
-  .languages-list{
+  .languages-list, .immunities-list, .resistances-list, .weaknesses-list, .item-list{
     display: flex;
   }
 

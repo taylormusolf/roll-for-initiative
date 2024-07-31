@@ -19,120 +19,221 @@ const MonsterStatBlock = ({ data }) => {
     },
     items,
   } = data;
+  function spellNumber(num){
+    if(num === 1) return '1st';
+    if(num === 2) return '2nd';
+    if(num === 3) return '3rd';
+    return num + 'th';
+  }
+  function actions(input){
+    const action = {
+        1: '◆',
+        2: '◆◆',
+        3: '◆◆◆',
+        'free': '◇',
+        'reaction': '⟳'
+
+    }
+    return action[input];
+  }
+  function knowledgeCheck(mType, mRarity){
+    mType = mType.toLowerCase()
+    mRarity = mRarity.toLowerCase()
+    const type = {
+        'aberration': ['occultism'],
+        'animal': ['nature'],
+        'astral': ['occultism'],
+        'beast': ['arcana', 'nature'],
+        'celestial': ['religion'],
+        'construct': ['arcana', 'crafting'],
+        'dragon': ['arana'],
+        'dream': ['occultism'],
+        'elemental': ['arcana', 'nature'],
+        'ethereal': ['occultism'],
+        'fey': ['nature'],
+        'fiend': ['religion'],
+        'fungus': ['nature'],
+        'humanoid': ['society'],
+        'monitor': ['religion'],
+        'ooze': ['occultism'],
+        'plant': ['nature'],
+        'shade': ['religion'],
+        'spirit': ['occultism'],
+        'time': ['occultims'],
+        'undead': ['religion']
+    }
+    const rarity = {
+        'common': 15,
+        'uncommon': 17,
+        'rare': 20,
+        'unique': 25
+    }
+    return `${mType} (${type[mType].join(', ')}): DC ${rarity[mRarity]}`
+  }
 
   return (
     <div className="monster-stat-block">
-      <div className="header">
-        <h1>{name.toUpperCase()}</h1>
-        <h1>CREATURE {level.value}</h1>
-      </div>
-      <div className='misc-stats'>
-        <div className="traits">
-            <div className='traits-size'>{size.value.toUpperCase()}</div>
-            {value.map((t)=>{
-                return <div className='traits-misc' key={t} >{t.toUpperCase()}</div>
-            })}
+        <div className="header">
+            <h1>{name.toUpperCase()}</h1>
+            <h1>CREATURE {level.value}</h1>
         </div>
-        <div className="perception">
-            <label>Perception</label>
-            <div>{`+${mod}; `}</div>
-            {senses.map((t, i)=>{
-                return(
-                    <React.Fragment key={t.type}> 
-                        {!!i && ", "} 
-                        <div> 
-                            {t.type}
-                        </div>
-                    </React.Fragment>
-                ) 
-            })}
-            {' '}
-            <div>{details}</div>
+        {/* add a recall knowledge */}
+        {/* <div><label>Recall Knowledge</label>{knowledgeCheck()}</div> */}
+        <div className='misc-stats'>
+            <div className="traits">
+                <div className='traits-size'>{rarity.toUpperCase()}</div>
+                <div className='traits-size'>{size.value.toUpperCase()}</div>
+                {value.map((t)=>{
+                    return <div className='traits-misc' key={t} >{t.toUpperCase()}</div>
+                })}
+            </div>
+            <div className="perception">
+                <label>Perception</label>
+                <div>{`+${mod}; `}</div>
+                {senses.map((t, i)=>{
+                    return(
+                        <React.Fragment key={t.type}> 
+                            {!!i && ", "} 
+                            <div> 
+                                {t.type}
+                            </div>
+                        </React.Fragment>
+                    ) 
+                })}
+                {' '}
+                <div>{details}</div>
+            </div>
+            <div className="languages">
+                <label>Languages</label>
+                <ul className="languages-list">
+                    {languages.value.map((language, index) => (
+                        <li key={index}>{language.charAt(0).toLocaleUpperCase() + language.slice(1)}</li>
+                    ))}
+                </ul>
+            </div>
+            <div className="skills">
+                <label>Skills</label>
+                {Object.keys(skills).map((skill, index) => (
+                    <li key={index}>{`${skill.charAt(0).toLocaleUpperCase() + skill.slice(1)} +${skills[skill].base}`}</li>
+                ))}
+            </div>
+            <div className="abilities">
+                <ul className='abilities-list'>
+                    <li key={'Str'}><label>Str</label>{`+${abilities['str'].mod},`}</li>
+                    <li key={'Dex'}><label>Dex</label>{`+${abilities['dex'].mod},`}</li>
+                    <li key={'Con'}><label>Con</label>{`+${abilities['con'].mod},`}</li>
+                    <li key={'Int'}><label>Int</label>{`+${abilities['int'].mod},`}</li>
+                    <li key={'Wis'}><label>Wis</label>{`+${abilities['wis'].mod},`}</li>
+                    <li key={'Cha'}><label>Cha</label>{`+${abilities['cha'].mod}`}</li>
+                </ul>
+            </div>
+            <div className='special'>
+                <label></label>
+            </div>
+            <div className="items">
+                <label>Items</label>
+            </div>
         </div>
-        <div className="languages">
-            <label>Languages</label>
-            <ul className="languages-list">
-                {languages.value.map((language, index) => (
-                    <li key={index}>{language.charAt(0).toLocaleUpperCase() + language.slice(1)}</li>
+        <div className="defense">
+            <div className="defense-top-line">
+                <li><label>AC</label>{ac.value};</li>
+                <li><label>Fort</label>{`+${fortitude.value}`}</li>
+                <li><label>Ref</label>{`+${reflex.value}`}</li> 
+                <li><label>Will</label>{`+${will.value}`}</li> 
+                <li>{`; ${allSaves.value}`}</li> 
+            </div>
+            <div className="defense-top-line">
+                <div><label>HP</label>{hp.max};</div>    
+                <div className="immunities">
+                    <ul className='immunities-list'>
+                        <label>Immunities</label>
+                        {immunities.map((immunity, index) => (
+                            <li key={index}>{immunity.type}</li>
+                        ))}
+                    </ul>
+                </div>
+            </div>
+            <div className="resistances">
+                <label>Resistances</label>
+                <ul className='resistances-list'>
+                {resistances.map((resistance, index) => (
+                    <li key={index}>{`${resistance.type} ${resistance.value}`}</li>
+                ))}
+                </ul>
+            </div>
+            <div className="weaknesses">
+                <label>Weaknesses</label>
+                <ul className='weaknesses-list'>
+                {weaknesses.map((weakness, index) => (
+                    <li key={index}>{`${weakness.type} ${weakness.value}`}</li>
+                ))}
+                </ul>
+            </div>
+        </div>
+        <div className='offense'>
+            <div><label>Speed</label>{speed.value} feet,</div>
+            <ul className='speeds-list'>
+                {speed.otherSpeeds.map((speed, index) => (
+                    <li key={index}>{`${speed.type} ${speed.value} feet`}</li>
                 ))}
             </ul>
+
         </div>
-        <div className="skills">
-            <label>Skills</label>
-            {Object.keys(skills).map((skill, index) => (
-                <li key={index}>{`${skill.charAt(0).toLocaleUpperCase() + skill.slice(1)} +${skills[skill].base}`}</li>
-            ))}
-        </div>
-        <div className="abilities">
-            <ul className='abilities-list'>
-                <li key={'Str'}>
-                    <label>Str</label>
-                    {console.log(abilities)}
-                    {`+${abilities['str'].mod},`}
-                </li>
-                <li key={'Dex'}>
-                    <label>Dex</label>
-                    {console.log(abilities)}
-                    {`+${abilities['dex'].mod},`}
-                </li>
-                <li key={'Con'}>
-                    <label>Con</label>
-                    {console.log(abilities)}
-                    {`+${abilities['con'].mod},`}
-                </li>
-                <li key={'Int'}>
-                    <label>Int</label>
-                    {console.log(abilities)}
-                    {`+${abilities['int'].mod},`}
-                </li>
-                <li key={'Wis'}>
-                    <label>Wis</label>
-                    {console.log(abilities)}
-                    {`+${abilities['wis'].mod},`}
-                </li>
-                <li key={'Cha'}>
-                    <label>Cha</label>
-                    {console.log(abilities)}
-                    {`+${abilities['cha'].mod}`}
-                </li>
+        <div className="items">
+            {console.log(items)}
+            <ul>
+                {items.map((item) => {
+                    if(item.type === 'spell'){
+                        return (
+                        <li key={item._id}>
+                        <p><label>{spellNumber(item.system.level.value)}</label>{item.name.toLowerCase()};</p>
+                        {/* <p>{item.system.description.value}</p> */}
+
+                        </li>
+                        )
+
+                    }else if(item.type === 'melee'){
+                        const {damageRolls} = item.system;
+                        return (
+                            <li key={item._id}>
+                                <label>Melee</label>
+                                <p>{item.name.toLowerCase()}</p>
+                                <p>+{item.system.bonus.value}</p>
+                                <ul className=''>(
+                                    {item.system.traits.value.map((trait, index) => (
+                                        <li key={index}>{trait}</li>
+                                    ))}
+                                    {/* {item.system.size === 'tiny' && <li>reach 0 feet</li>} */}
+                                )</ul>
+                                <ul className=''>
+                                    {Object.values(damageRolls).map((damageRoll, index) => (
+                                        <li key={index}><label>Damage</label>{damageRoll.damage}{damageRoll.damageType}</li>
+                                    ))}
+                                    {/* {item.system.size === 'tiny' && <li>reach 0 feet</li>} */}
+                                </ul>
+                            </li>
+                        )
+
+                    }else if(item.type === 'action'){
+                        return (
+                            <li key={item._id}>
+                                <label>{item.name}</label>
+                                {item.system.actions.value && <div>{actions(item.system.actions.value)}</div>}
+                                <div dangerouslySetInnerHTML={{ __html:item.system.description.value}}></div>
+                            </li>
+                        )
+
+                    }else if(item.type === 'spellcastingEntry'){
+                        return (
+                            <div className='item-list' key={item._id}>
+                                <label>{item.name}</label>
+                                <div>DC {item.system.spelldc.dc}</div>
+                            </div>
+                        )
+                    }
+                })}
             </ul>
         </div>
-
-      </div>
-      <div className="section attributes">
-        <h2>Attributes</h2>
-        <p>AC: {ac.value}</p>
-        <p>HP: {hp.max}</p>
-        <p>Speed: {speed.value} ft.</p>
-        <p>Fly Speed: {speed.otherSpeeds[0].value} ft.</p>
-      </div>
-      <div className="section immunities">
-        <h2>Immunities</h2>
-        <ul>
-          {immunities.map((immunity, index) => (
-            <li key={index}>{immunity.type}</li>
-          ))}
-        </ul>
-      </div>
-      <div className="section resistances">
-        <h2>Resistances</h2>
-        <ul>
-          {resistances.map((resistance, index) => (
-            <li key={index}>{`${resistance.type}: ${resistance.value}`}</li>
-          ))}
-        </ul>
-      </div>
-      <div className="section items">
-        <h2>Items & Abilities</h2>
-        <ul>
-          {items.map((item) => (
-            <li key={item._id}>
-              <img src={item.img} alt={item.name} />
-              <p>{item.name}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
       <div className="section notes">
         <h2>Notes</h2>
         <p dangerouslySetInnerHTML={{ __html: publicNotes }}></p>
