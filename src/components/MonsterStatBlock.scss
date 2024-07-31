@@ -1,0 +1,73 @@
+.monster-stat-block {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    max-width: 600px;
+    margin: auto;
+    background-color: #f8f8f8;
+    color: black;
+    label {
+      font-weight: 700;
+      padding-right: .25rem;
+    }
+    li {
+      padding-right: .25rem;
+    }
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid;
+    h1 {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+  }
+  
+  .perception, .languages, .skills, .abilities-list, .traits{
+    display: flex;
+    padding-top:5px;
+  }
+  .languages-list{
+    display: flex;
+  }
+
+  .traits-size, .traits-misc{
+    color: white;
+    background-color: green;
+    font-weight: 700;
+    padding: 5px;
+    border: 2px solid rgb(196, 182, 101);
+  }
+
+  .traits-misc{
+    background-color: #3d0202;
+  }
+  
+  .section {
+    margin-top: 20px;
+  }
+  
+  .section h2 {
+    margin-bottom: 10px;
+  }
+  
+  .section ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+  
+  .section ul li {
+    padding: 5px 0;
+  }
+  
+  .section.items ul li {
+    display: flex;
+    align-items: center;
+  }
+  
+  .section.items ul li img {
+    max-width: 40px;
+    margin-right: 10px;
+  }
+  
