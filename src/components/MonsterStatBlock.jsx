@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './MonsterStatBlock.scss'; // Create a CSS file for styles
 
-const MonsterStatBlock = ({ data }) => {
+const MonsterStatBlock = ({ url }) => {
+    const [data, setData] = useState(undefined);
+    useEffect(()=> {
+        fetch(url).then(res => res.json()).then(dat => setData(dat))
+    }, [])
+
+    if(data === undefined) return null;
+    console.log(data)
   const {
     img,
     name,
@@ -25,16 +32,20 @@ const MonsterStatBlock = ({ data }) => {
     if(num === 3) return '3rd';
     return num + 'th';
   }
-  function actions(input){
-    const action = {
-        1: '◆',
-        2: '◆◆',
-        3: '◆◆◆',
-        'free': '◇',
-        'reaction': '⟳'
-
+  function actions(type, num){
+      const action = {
+          1: '◆',
+          2: '◆◆',
+          3: '◆◆◆',
+          'free': '◇',
+          'reaction': '⟳'
+  
+      }
+      
+    if(num){
+        return action[num]
     }
-    return action[input];
+    return action[type];
   }
   function knowledgeCheck(mType, mRarity){
     mType = mType.toLowerCase()
@@ -83,14 +94,14 @@ const MonsterStatBlock = ({ data }) => {
             <div className="traits">
                 <div className='traits-size'>{rarity.toUpperCase()}</div>
                 <div className='traits-size'>{size.value.toUpperCase()}</div>
-                {value.map((t)=>{
+                {value?.map((t)=>{
                     return <div className='traits-misc' key={t} >{t.toUpperCase()}</div>
                 })}
             </div>
             <div className="perception">
                 <label>Perception</label>
                 <div>{`+${mod}; `}</div>
-                {senses.map((t, i)=>{
+                {senses?.map((t, i)=>{
                     return(
                         <React.Fragment key={t.type}> 
                             {!!i && ", "} 
@@ -106,33 +117,34 @@ const MonsterStatBlock = ({ data }) => {
             <div className="languages">
                 <label>Languages</label>
                 <ul className="languages-list">
-                    {languages.value.map((language, index) => (
+                    {languages?.value.map((language, index) => (
                         <li key={index}>{language.charAt(0).toLocaleUpperCase() + language.slice(1)}</li>
                     ))}
+                    {languages.details}
                 </ul>
             </div>
             <div className="skills">
                 <label>Skills</label>
-                {Object.keys(skills).map((skill, index) => (
+                {Object.keys(skills)?.map((skill, index) => (
                     <li key={index}>{`${skill.charAt(0).toLocaleUpperCase() + skill.slice(1)} +${skills[skill].base}`}</li>
                 ))}
             </div>
             <div className="abilities">
                 <ul className='abilities-list'>
-                    <li key={'Str'}><label>Str</label>{`+${abilities['str'].mod},`}</li>
-                    <li key={'Dex'}><label>Dex</label>{`+${abilities['dex'].mod},`}</li>
-                    <li key={'Con'}><label>Con</label>{`+${abilities['con'].mod},`}</li>
-                    <li key={'Int'}><label>Int</label>{`+${abilities['int'].mod},`}</li>
-                    <li key={'Wis'}><label>Wis</label>{`+${abilities['wis'].mod},`}</li>
-                    <li key={'Cha'}><label>Cha</label>{`+${abilities['cha'].mod}`}</li>
+                    <li key={'Str'}><label>Str</label>{`${abilities['str'].mod > 0 ? '+':''}${abilities['str'].mod},`}</li>
+                    <li key={'Dex'}><label>Dex</label>{`${abilities['dex'].mod > 0 ? '+':''}${abilities['dex'].mod},`}</li>
+                    <li key={'Con'}><label>Con</label>{`${abilities['con'].mod > 0 ? '+':''}${abilities['con'].mod},`}</li>
+                    <li key={'Int'}><label>Int</label>{`${abilities['int'].mod > 0 ? '+':''}${abilities['int'].mod},`}</li>
+                    <li key={'Wis'}><label>Wis</label>{`${abilities['wis'].mod > 0 ? '+':''}${abilities['wis'].mod},`}</li>
+                    <li key={'Cha'}><label>Cha</label>{`${abilities['cha'].mod > 0 ? '+':''}${abilities['cha'].mod}`}</li>
                 </ul>
             </div>
             <div className='special'>
                 <label></label>
             </div>
-            <div className="items">
+            {/* <div className="items">
                 <label>Items</label>
-            </div>
+            </div> */}
         </div>
         <div className="defense">
             <div className="defense-top-line">
@@ -144,36 +156,36 @@ const MonsterStatBlock = ({ data }) => {
             </div>
             <div className="defense-top-line">
                 <div><label>HP</label>{hp.max};</div>    
-                <div className="immunities">
+                {immunities?.length && <div className="immunities">
                     <ul className='immunities-list'>
                         <label>Immunities</label>
-                        {immunities.map((immunity, index) => (
+                        {immunities?.map((immunity, index) => (
                             <li key={index}>{immunity.type}</li>
                         ))}
                     </ul>
-                </div>
+                </div>}
             </div>
-            <div className="resistances">
+            {resistances?.length && <div className="resistances">
                 <label>Resistances</label>
                 <ul className='resistances-list'>
-                {resistances.map((resistance, index) => (
+                {resistances?.map((resistance, index) => (
                     <li key={index}>{`${resistance.type} ${resistance.value}`}</li>
                 ))}
                 </ul>
-            </div>
-            <div className="weaknesses">
+            </div>}
+            {weaknesses?.length && <div className="weaknesses">
                 <label>Weaknesses</label>
                 <ul className='weaknesses-list'>
-                {weaknesses.map((weakness, index) => (
+                {weaknesses?.map((weakness, index) => (
                     <li key={index}>{`${weakness.type} ${weakness.value}`}</li>
                 ))}
                 </ul>
-            </div>
+            </div>}
         </div>
         <div className='offense'>
             <div><label>Speed</label>{speed.value} feet,</div>
             <ul className='speeds-list'>
-                {speed.otherSpeeds.map((speed, index) => (
+                {speed.otherSpeeds?.map((speed, index) => (
                     <li key={index}>{`${speed.type} ${speed.value} feet`}</li>
                 ))}
             </ul>
@@ -181,8 +193,8 @@ const MonsterStatBlock = ({ data }) => {
         </div>
         <div className="items">
             {console.log(items)}
-            <ul>
-                {items.map((item) => {
+            <ul className="items-list">
+                {items?.map((item) => {
                     if(item.type === 'spell'){
                         return (
                         <li key={item._id}>
@@ -199,17 +211,15 @@ const MonsterStatBlock = ({ data }) => {
                                 <label>Melee</label>
                                 <p>{item.name.toLowerCase()}</p>
                                 <p>+{item.system.bonus.value}</p>
-                                <ul className=''>(
-                                    {item.system.traits.value.map((trait, index) => (
-                                        <li key={index}>{trait}</li>
+                                <ul className='item-desc'>(
+                                    {item.system.traits.value?.map((trait, index) => (
+                                        <div key={index}>{trait}</div>
                                     ))}
-                                    {/* {item.system.size === 'tiny' && <li>reach 0 feet</li>} */}
                                 )</ul>
-                                <ul className=''>
-                                    {Object.values(damageRolls).map((damageRoll, index) => (
-                                        <li key={index}><label>Damage</label>{damageRoll.damage}{damageRoll.damageType}</li>
+                                <ul className='item-desc'>
+                                    {Object.values(damageRolls)?.map((damageRoll, index) => (
+                                        <div key={index}><label>Damage</label>{damageRoll.damage}{damageRoll.damageType}</div>
                                     ))}
-                                    {/* {item.system.size === 'tiny' && <li>reach 0 feet</li>} */}
                                 </ul>
                             </li>
                         )
@@ -218,7 +228,7 @@ const MonsterStatBlock = ({ data }) => {
                         return (
                             <li key={item._id}>
                                 <label>{item.name}</label>
-                                {item.system.actions.value && <div>{actions(item.system.actions.value)}</div>}
+                                {item.system.actions.value !== 'passive' && <div>{actions(item.system.actionType.value, item.system.actions?.value)}</div>}
                                 <div dangerouslySetInnerHTML={{ __html:item.system.description.value}}></div>
                             </li>
                         )

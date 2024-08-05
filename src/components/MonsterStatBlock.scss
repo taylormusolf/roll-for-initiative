@@ -27,11 +27,11 @@
     border-bottom: 1px solid;
   }
   
-  .perception, .languages, .skills, .abilities-list, .traits, .items, .special, .resistances, .defense-top-line, .weaknesses, .offense{
+  .perception, .languages, .skills, .abilities-list, .traits, .special, .resistances, .defense-top-line, .weaknesses, .offense{
     display: flex;
     padding-top:5px;
   }
-  .languages-list, .immunities-list, .resistances-list, .weaknesses-list, .item-list{
+  .languages-list, .immunities-list, .resistances-list, .weaknesses-list{
     display: flex;
   }
 
@@ -47,30 +47,27 @@
     background-color: #3d0202;
   }
   
-  .section {
-    margin-top: 20px;
-  }
+ .items{
+  display: flex;
   
-  .section h2 {
-    margin-bottom: 10px;
+ }
+.items-list{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  label{
+    white-space:nowrap;
   }
-  
-  .section ul {
-    list-style-type: none;
-    padding-left: 0;
-  }
-  
-  .section ul li {
-    padding: 5px 0;
-  }
-  
-  .section.items ul li {
+
+  li{
     display: flex;
-    align-items: center;
+    padding-top: 5px;
   }
-  
-  .section.items ul li img {
-    max-width: 40px;
-    margin-right: 10px;
-  }
+}
+
+.item-desc{
+  display: flex;
+  padding-right: 5px;
+}
+
   
