@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import './MonsterStatBlock.scss'; // Create a CSS file for styles
+import './MonsterStatBlock.scss';
 
-const MonsterStatBlock = ({ url }) => {
-    const [data, setData] = useState(undefined);
+//selectedBestiary, selectedName, setStatblock will be used at NPC creation
+//block will be used to look at stats after creation
+const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }) => {
+    const [data, setData] = useState(block);
     useEffect(()=> {
-        fetch(url).then(res => res.json()).then(dat => setData(dat))
-    }, [])
-
+        if(!block){
+            const url = `http://taylormusolf.com/pf2e/packs/${selectedBestiary}/${selectedName}.json`
+            fetch(url).then(res => res.json()).then(dat => setData(dat))
+        }
+    }, [selectedName])
+    useEffect(()=> {
+        setStatblock(data)
+    }, [data])
     if(data === undefined) return null;
-    console.log(data)
   const {
     img,
     name,
@@ -192,7 +198,7 @@ const MonsterStatBlock = ({ url }) => {
 
         </div>
         <div className="items">
-            {console.log(items)}
+            {/* {console.log(items)} */}
             <ul className="items-list">
                 {items?.map((item) => {
                     if(item.type === 'spell'){

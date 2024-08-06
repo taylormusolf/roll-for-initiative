@@ -1,0 +1,38 @@
+/* MonsterDrawer.css */
+.monster-drawer {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 300px;
+  height: 100%;
+  background-color: white;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  z-index: 1000;
+  overflow-y: auto;
+  color: black;
+}
+
+.monster-drawer button {
+  display: block;
+  margin-bottom: 10px;
+  background-color: black;
+  color: white;
+}
+
+.monster-drawer ul {
+  list-style: none;
+  padding: 0;
+}
+
+.monster-drawer li {
+  cursor: pointer;
+  padding: 5px;
+}
+
+.monster-drawer li:hover {
+  background-color: #f0f0f0;
+}
+
+  
+  

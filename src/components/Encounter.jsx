@@ -12,21 +12,7 @@ const Encounter = () => {
   const [currentTurn, setCurrentTurn] = useState(0);
   const [isPreCombat, setIsPreCombat] = useState(true);
   const encounter = encounters.find(enc => enc.id === Number(id));
-  // const [initiativeOrder, setInitiativeOrder] = useState([
-  //   { id: 1, name: "Taylor", maxHP: 100, isPC: true, maxHp: 100, health: 100, initiative: 20, conditions: []}, 
-  //   { id: 2, name: "Karisa", maxHP: 50, isPC: true, maxHp: 100, health: 50, initiative: 21, conditions: []}, 
-  //   { id: 3, name: "Bugbear", maxHP: 200, isPC: false, maxHp: 100, health: 50, initiative: 5, conditions: []}
-  // ]);
-  
-  useEffect(() => {
-    if(encountersPulled){
-      const encounter = encounters.find(enc => enc.id === Number(id));
-      if (encounter) {
-        setInitiativeOrder(encounter.combatants);
-        setIsPreCombat(encounter.isPreCombat);
-      }
-    }
-  }, [id, encountersPulled]);
+  const [playerNum, setPlayerNum] = useState(1);
 
   useEffect(() => {
     updateEncounter(Number(id), initiativeOrder, isPreCombat);
@@ -34,7 +20,8 @@ const Encounter = () => {
 
 
   const addCombatant = () => {
-    setInitiativeOrder([...initiativeOrder, { id: initiativeOrder.length, name: 'Player ' + (initiativeOrder.length + 1), initiative: 0, health: 100, maxHp: 100, useHealth: true, notes: '', conditions: [] }]);
+    setInitiativeOrder([...initiativeOrder, { id: Math.floor(Math.random()*1000), name: 'Player ' + (playerNum), initiative: 0, health: 100, maxHp: 100, useHealth: true, notes: '', conditions: [] }]);
+    setPlayerNum(playerNum + 1);
   };
   // const startEncounter = (sortedCombatants) => {
   //   setInitiativeOrder(sortedCombatants);
@@ -122,7 +109,7 @@ const Encounter = () => {
       <Link to="/">Back to Manager</Link>
       <h1>{encounter ? encounter.name : 'Loading...'}</h1>
       {isPreCombat ? (
-        <PreCombatSetup setCombatants={setInitiativeOrder} combatants = {initiativeOrder} setIsPreCombat ={setIsPreCombat} />
+        <PreCombatSetup setCombatants={setInitiativeOrder} combatants = {initiativeOrder} setIsPreCombat ={setIsPreCombat} addCombatant={addCombatant}/>
       ): (
         <div>
           <h2>Round: {round}</h2>
