@@ -53,6 +53,7 @@ const Combatant = ({
   name,
   initiative,
   health,
+  hp,
   maxHp,
   conditions,
   isCurrent,
@@ -105,10 +106,10 @@ const Combatant = ({
       {useHealth &&(
         <>
           <div style={healthBarContainerStyle}>
-            <div style={healthBarStyle(health, maxHp)} />
+            <div style={healthBarStyle(hp, maxHp)} />
           </div>
           <p style={{ marginRight: '10px' }}>
-            Health: {health}/{maxHp}
+            Health: {hp}/{maxHp}
           </p>
           <div style={{ marginRight: '10px' }}>
             <input

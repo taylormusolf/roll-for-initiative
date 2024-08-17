@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { EncounterContext } from '../context/EncounterContext';
 import Combatant from './Combatant';
@@ -7,27 +7,37 @@ import PreCombatSetup from './PreCombatSetup';
 const Encounter = () => {
   const { id } = useParams();
   const { encounters, updateEncounter, encountersPulled } = useContext(EncounterContext);
+  const encounter = encounters.find(enc => enc.id === Number(id));
+  const combatants = encounter?.combatants;
   const [round, setRound] = useState(1);
   const [initiativeOrder, setInitiativeOrder] =  useState([]);
   const [currentTurn, setCurrentTurn] = useState(0);
   const [isPreCombat, setIsPreCombat] = useState(true);
-  const encounter = encounters.find(enc => enc.id === Number(id));
   const [playerNum, setPlayerNum] = useState(1);
+  const [isModified, setIsModified] = useState(false);
 
-  useEffect(() => {
-    updateEncounter(Number(id), initiativeOrder, isPreCombat);
-  }, [id, initiativeOrder]);
+  useEffect(()=> {
+    if(combatants){
+      setInitiativeOrder(combatants);
+      setIsPreCombat(encounter.isPreCombat)
+    }
+  }, [combatants])
+
+  const handleDataChange = (newData) => {
+    setInitiativeOrder(newData);
+    setIsModified(true);
+  }
+  useEffect(()=> {
+    if(isModified){
+      updateEncounter(Number(id), initiativeOrder, isPreCombat).then(()=> setIsModified(false));
+    }
+  }, [initiativeOrder, isModified])
 
 
   const addCombatant = () => {
-    setInitiativeOrder([...initiativeOrder, { id: Math.floor(Math.random()*1000), name: 'Player ' + (playerNum), initiative: 0, health: 100, maxHp: 100, useHealth: true, notes: '', conditions: [] }]);
+    handleDataChange([...initiativeOrder, { id: Math.floor(Math.random()*1000), name: 'Player ' + (playerNum), initiative: 0, hp: 100, maxHp: 100, useHealth: true, isPC: true, notes: '', conditions: [] }])
     setPlayerNum(playerNum + 1);
   };
-  // const startEncounter = (sortedCombatants) => {
-  //   setInitiativeOrder(sortedCombatants);
-  //   setRound(1);
-  //   setCurrentTurn(0);
-  // };
 
   const nextTurn = () => {
     const newOrder = [...initiativeOrder];
@@ -38,7 +48,7 @@ const Encounter = () => {
       }
       return condition;
     });
-    setInitiativeOrder(newOrder);
+    handleDataChange(newOrder);
     setCurrentTurn((currentTurn + 1) % initiativeOrder.length);
     if (currentTurn === initiativeOrder.length - 1) {
       setRound(round + 1);
@@ -57,7 +67,7 @@ const Encounter = () => {
     if (index > 0) {
       const newOrder = [...initiativeOrder];
       [newOrder[index - 1], newOrder[index]] = [newOrder[index], newOrder[index - 1]];
-      setInitiativeOrder(newOrder);
+      handleDataChange(newOrder);
     }
   };
 
@@ -66,7 +76,7 @@ const Encounter = () => {
     if (index < initiativeOrder.length - 1) {
       const newOrder = [...initiativeOrder];
       [newOrder[index + 1], newOrder[index]] = [newOrder[index], newOrder[index + 1]];
-      setInitiativeOrder(newOrder);
+      handleDataChange(newOrder);
     }
   };
 
@@ -74,26 +84,27 @@ const Encounter = () => {
     const newOrder = initiativeOrder.map(combatant =>
       combatant.id === id ? { ...combatant, health: newHealth } : combatant
     );
-    setInitiativeOrder(newOrder);
+    handleDataChange(newOrder);
   };
 
   const updateName = (id, newName) => {
     const newOrder = initiativeOrder.map(combatant =>
       combatant.id === id ? { ...combatant, name: newName } : combatant
     );
-    setInitiativeOrder(newOrder);
+    handleDataChange(newOrder);
   };
 
   const updateConditions = (id, conditions) => {
     const newOrder = initiativeOrder.map(combatant =>
       combatant.id === id ? { ...combatant, conditions } : combatant
     );
-    setInitiativeOrder(newOrder);
+    handleDataChange(newOrder);
   };
 
   const removeCombatant = (index) => {
     const updatedCombatants = initiativeOrder.filter((_, i) => i !== index);
-    setInitiativeOrder(updatedCombatants);
+    console.log(updatedCombatants)
+    handleDataChange(updatedCombatants);
     if (currentTurn >= updatedCombatants.length) {
       setCurrentTurn(updatedCombatants.length - 1);
     }
@@ -109,14 +120,14 @@ const Encounter = () => {
       <Link to="/">Back to Manager</Link>
       <h1>{encounter ? encounter.name : 'Loading...'}</h1>
       {isPreCombat ? (
-        <PreCombatSetup setCombatants={setInitiativeOrder} combatants = {initiativeOrder} setIsPreCombat ={setIsPreCombat} addCombatant={addCombatant}/>
+        <PreCombatSetup setCombatants={handleDataChange} combatants = {initiativeOrder} setIsPreCombat ={setIsPreCombat} addCombatant={addCombatant} removeCombatant={removeCombatant}/>
       ): (
         <div>
           <h2>Round: {round}</h2>
           <button onClick={prevTurn}>Previous</button>
           <button onClick={nextTurn}>Next</button>
-          {initiativeOrder.map((combatant, index) => (
-            <Combatant
+          {initiativeOrder.map((combatant, index) => {
+            return <Combatant
               key={combatant.id}
               {...combatant}
               isCurrent={index === currentTurn}
@@ -125,9 +136,9 @@ const Encounter = () => {
               updateHealth={updateHealth}
               updateName={updateName}
               updateConditions={updateConditions}
-              removeCombatant={removeCombatant}
+              removeCombatant={() => removeCombatant(index)}
             />
-          ))}
+})}
           <button onClick={addCombatant}>Add Combatant</button>
           <button onClick={endEncounter}>End Encounter</button>
         </div>

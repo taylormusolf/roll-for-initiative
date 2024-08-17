@@ -8,8 +8,8 @@ import MonsterStatBlock from './components/MonsterStatBlock';
 import CombatantLibraryProvider from './context/CombatantLibraryContext';
 import CombatantLibrary from './components/CombatantLibrary';
 
-const monsterURL= 'https://taylormusolf.com/pf2e/packs/abomination-vaults-bestiary/afflicted-irnakurse.json'
-
+// const monsterURL= 'https://taylormusolf.com/pf2e/packs/abomination-vaults-bestiary/afflicted-irnakurse.json'
+console.log(localStorage.getItem('encounters'))
 
 const App = () => (
   <EncounterProvider>
@@ -19,7 +19,7 @@ const App = () => (
           <Routes>
             <Route path="/" exact element={<EncounterManager />} />
             <Route path="/encounter/:id" element={<Encounter />} />
-            <Route path="/monster" element={<MonsterStatBlock url={monsterURL}/>} />
+            {/* <Route path="/monster" element={<MonsterStatBlock url={monsterURL}/>} /> */}
             <Route path="/library" element={<CombatantLibrary/>} />
           </Routes>
         </div>

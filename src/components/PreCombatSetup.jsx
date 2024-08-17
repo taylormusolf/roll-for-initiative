@@ -7,7 +7,7 @@ import { CombatantLibraryContext } from '../context/CombatantLibraryContext';
 import MonsterDrawer from './MonsterDrawer';
 import monsters from '../assets/data/monsters.json'
 
-const PreCombatSetup = ({ startEncounter, combatants, setCombatants, setIsPreCombat, addCombatant }) => {
+const PreCombatSetup = ({ startEncounter, combatants, setCombatants, setIsPreCombat, addCombatant, removeCombatant }) => {
     const { id } = useParams();
     const { library } = useContext(CombatantLibraryContext);
     const { encounters, updateEncounter, encountersPulled } = useContext(EncounterContext);
@@ -18,10 +18,6 @@ const PreCombatSetup = ({ startEncounter, combatants, setCombatants, setIsPreCom
         const updatedCombatants = combatants.map((combatant, i) =>
         i === index ? { ...combatant, [key]: value } : combatant
         );
-        setCombatants(updatedCombatants);
-    };
-    const removeCombatant = (index) => {
-        const updatedCombatants = combatants.filter((_, i) => i !== index);
         setCombatants(updatedCombatants);
     };
     const addCombatantFromLibrary = (combatant) => {

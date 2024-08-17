@@ -50,6 +50,8 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
           } = statblock;
 
       const monster = {
+        id: Math.floor(Math.random()*1000),
+        conditions: [],
         name,
         ac,
         hp,
@@ -61,7 +63,8 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
         will,
         initiative: 0,
         stats: JSON.stringify(statblock),
-        npc: true
+        isPC: false,
+        notes: ''
       };
       addMonster(monster);
       closeDrawer();
