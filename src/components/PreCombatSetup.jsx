@@ -1,16 +1,15 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { generateRandomNumber } from '../util/random';
-import { Link, useParams } from 'react-router-dom';
-import Encounter from './Encounter';
+import { useParams } from 'react-router-dom';
 import { EncounterContext } from '../context/EncounterContext';
 import { CombatantLibraryContext } from '../context/CombatantLibraryContext';
 import MonsterDrawer from './MonsterDrawer';
 import monsters from '../assets/data/monsters.json'
 
-const PreCombatSetup = ({ startEncounter, combatants, setCombatants, setIsPreCombat, addCombatant, removeCombatant }) => {
+const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatant, removeCombatant, dupeCombatant }) => {
     const { id } = useParams();
     const { library } = useContext(CombatantLibraryContext);
-    const { encounters, updateEncounter, encountersPulled } = useContext(EncounterContext);
+    const { updateEncounter} = useContext(EncounterContext);
     const [showMonsterDrawer, setShowMonsterDrawer] = useState(false);
 
 
@@ -20,6 +19,7 @@ const PreCombatSetup = ({ startEncounter, combatants, setCombatants, setIsPreCom
         );
         setCombatants(updatedCombatants);
     };
+    
     const addCombatantFromLibrary = (combatant) => {
         setCombatants([...combatants, combatant]);
     };
@@ -60,9 +60,9 @@ const PreCombatSetup = ({ startEncounter, combatants, setCombatants, setIsPreCom
                         <label>Starting Health: </label>
                         <input
                             type="number"
-                            placeholder="Health"
-                            value={combatant.health}
-                            onChange={(e) => updateCombatant(index, 'health', Number(e.target.value))}
+                            placeholder="HP"
+                            value={combatant.hp}
+                            onChange={(e) => updateCombatant(index, 'hp', Number(e.target.value))}
                             style={{ marginRight: '10px', width: '80px' }}
                         />
                         <label>Max Health: </label>
@@ -77,9 +77,13 @@ const PreCombatSetup = ({ startEncounter, combatants, setCombatants, setIsPreCom
                 )}
                 <button onClick={() => updateCombatant(index, 'useHealth', !combatant.useHealth)}>Toggle Health</button>
                 <button onClick={() => removeCombatant(index)} style={{ marginLeft: '10px' }}>Remove</button>
+                <button onClick={() => dupeCombatant(index)} style={{ marginLeft: '10px' }}>Duplicate</button>
+
                 </div>
             ))}
-            <button onClick={addCombatant}>Add Combatant</button>
+            <button onClick={() => addCombatant(false)}>Add NPC</button>
+            <button onClick={() => setShowMonsterDrawer(true)}>Add NPC with Statblock</button>
+            <button onClick={() => addCombatant(true)}>Add PC</button>
             <button onClick={handleStart} disabled={combatants.length === 0}>
                 Start Encounter
             </button>
@@ -93,7 +97,6 @@ const PreCombatSetup = ({ startEncounter, combatants, setCombatants, setIsPreCom
                 ))}
             </div>
             <div>
-                <button onClick={() => setShowMonsterDrawer(true)}>Add NPC</button>
             </div>
             {showMonsterDrawer && (
                 <MonsterDrawer

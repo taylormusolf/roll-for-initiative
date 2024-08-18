@@ -13,7 +13,7 @@ const CombatantLibrary = () => {
 
   return (
     <div>
-      <h2>Combatant Library</h2>
+      <h2>Player Library</h2>
       {library.map((combatant, index) => (
         <div key={index}>
           <p>Name: {combatant.name}</p>

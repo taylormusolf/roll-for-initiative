@@ -6,7 +6,7 @@ import PreCombatSetup from './PreCombatSetup';
 
 const Encounter = () => {
   const { id } = useParams();
-  const { encounters, updateEncounter, encountersPulled } = useContext(EncounterContext);
+  const { encounters, updateEncounter} = useContext(EncounterContext);
   const encounter = encounters.find(enc => enc.id === Number(id));
   const combatants = encounter?.combatants;
   const [round, setRound] = useState(1);
@@ -17,25 +17,47 @@ const Encounter = () => {
   const [isModified, setIsModified] = useState(false);
 
   useEffect(()=> {
-    if(combatants){
-      setInitiativeOrder(combatants);
-      setIsPreCombat(encounter.isPreCombat)
+    if(combatants){ //update if combatants info is ready from local storage
+      setInitiativeOrder(combatants); //this update to initiativeOrder does not cause an update to localStorage
+      setIsPreCombat(encounter.isPreCombat);
     }
   }, [combatants])
 
-  const handleDataChange = (newData) => {
+  const handleDataChange = (newData) => { //handler that wraps updates to setInitiative that we want to update in localStorage
     setInitiativeOrder(newData);
     setIsModified(true);
   }
   useEffect(()=> {
-    if(isModified){
+    if(isModified){ //checks if the update to initiativeOrder is one that we want updated in localStorage
       updateEncounter(Number(id), initiativeOrder, isPreCombat).then(()=> setIsModified(false));
     }
   }, [initiativeOrder, isModified])
 
 
-  const addCombatant = () => {
-    handleDataChange([...initiativeOrder, { id: Math.floor(Math.random()*1000), name: 'Player ' + (playerNum), initiative: 0, hp: 100, maxHp: 100, useHealth: true, isPC: true, notes: '', conditions: [] }])
+  const addCombatant = (isPC) => {
+    handleDataChange([...initiativeOrder, 
+      { id: Math.floor(Math.random()*10000), 
+        name: 'Player ' + (playerNum), 
+        initiative: 0, 
+        ac: null,
+        currentHp: 100, 
+        maxHp: 100, 
+        tempHP: 0,
+        speed: null,
+        perception: null,
+        fortitude: null,
+        reflex: null,
+        will: null,
+        useHealth: true, 
+        isPC: isPC, 
+        notes: '', 
+        conditions: [] 
+      }])
+    setPlayerNum(playerNum + 1);
+  };
+  const dupeCombatant = (index) => {
+    const newCombatant = {...initiativeOrder[index], id: Math.floor(Math.random()*1000)};
+    handleDataChange([...initiativeOrder, newCombatant]);
     setPlayerNum(playerNum + 1);
   };
 
@@ -120,7 +142,7 @@ const Encounter = () => {
       <Link to="/">Back to Manager</Link>
       <h1>{encounter ? encounter.name : 'Loading...'}</h1>
       {isPreCombat ? (
-        <PreCombatSetup setCombatants={handleDataChange} combatants = {initiativeOrder} setIsPreCombat ={setIsPreCombat} addCombatant={addCombatant} removeCombatant={removeCombatant}/>
+        <PreCombatSetup setCombatants={handleDataChange} combatants = {initiativeOrder} setIsPreCombat ={setIsPreCombat} addCombatant={addCombatant} removeCombatant={removeCombatant} dupeCombatant={dupeCombatant}/>
       ): (
         <div>
           <h2>Round: {round}</h2>

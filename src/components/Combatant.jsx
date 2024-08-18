@@ -52,9 +52,18 @@ const Combatant = ({
   id,
   name,
   initiative,
-  health,
-  hp,
+  ac,
+  currentHp,
   maxHp,
+  tempHp,
+  speed,
+  perception,
+  fortitude,
+  reflex,
+  will,
+  useHealth,
+  isPC,
+  notes,
   conditions,
   isCurrent,
   moveUp,
@@ -62,8 +71,7 @@ const Combatant = ({
   updateHealth,
   updateName,
   updateConditions,
-  removeCombatant,
-  useHealth
+  removeCombatant
 }) => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [healthAdjustment, setHealthAdjustment] = useState('');
