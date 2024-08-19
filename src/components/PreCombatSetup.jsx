@@ -33,6 +33,12 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
         setCombatants(sortedCombatants);
         updateEncounter(Number(id), sortedCombatants, false);
     };
+    const npcInitiativeRoll = () => {
+        const updatedCombatants = combatants.map((combatant)=> (
+            !combatant.isPC ? { ...combatant, 'initiative': generateRandomNumber(20, combatant.perception || 0) } : combatant
+        ))
+        setCombatants(updatedCombatants);
+    }
 
     return (
         <div>
@@ -54,7 +60,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                     onChange={(e) => updateCombatant(index, 'initiative', Number(e.target.value))}
                     style={{ marginRight: '10px', width: '80px' }}
                 />
-                <button onClick={()=> updateCombatant(index, 'initiative', generateRandomNumber())}>Rand</button>
+                {/* <button onClick={()=> updateCombatant(index, 'initiative', generateRandomNumber())}>Rand</button> */}
                 {combatant.useHealth && (
                     <>
                         <label>Starting Health: </label>
@@ -84,6 +90,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
             <button onClick={() => addCombatant(false)}>Add NPC</button>
             <button onClick={() => setShowMonsterDrawer(true)}>Add NPC with Statblock</button>
             <button onClick={() => addCombatant(true)}>Add PC</button>
+            <button onClick={npcInitiativeRoll}>Roll Initiative for NPCs</button>
             <button onClick={handleStart} disabled={combatants.length === 0}>
                 Start Encounter
             </button>

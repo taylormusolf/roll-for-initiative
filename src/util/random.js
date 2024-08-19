@@ -1,6 +1,5 @@
-export const generateRandomNumber = num => {
-    if(!num) num = 20;
-    return Math.floor(Math.random() * num) + 1;
+export const generateRandomNumber = (diceSize, mod) => {
+    return Math.floor(Math.random() * diceSize) + 1 + mod;
 }
 
 
