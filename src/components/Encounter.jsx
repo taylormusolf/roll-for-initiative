@@ -1,12 +1,15 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { uniqueNamesGenerator, names } from 'unique-names-generator';
 import { EncounterContext } from '../context/EncounterContext';
+import { CombatantLibraryContext } from '../context/CombatantLibraryContext';
 import Combatant from './Combatant';
 import PreCombatSetup from './PreCombatSetup';
 
 const Encounter = () => {
   const { id } = useParams();
   const { encounters, updateEncounter} = useContext(EncounterContext);
+  const { library, addCombatantToLibrary, removeCombatantFromLibrary } = useContext(CombatantLibraryContext);
   const encounter = encounters.find(enc => enc.id === Number(id));
   const combatants = encounter?.combatants;
   const [round, setRound] = useState(1);
@@ -34,20 +37,22 @@ const Encounter = () => {
   }, [initiativeOrder, isModified])
 
 
-  const addCombatant = (isPC) => {
+  const addCombatant = async(isPC) => {
+    const characterName = uniqueNamesGenerator({dictionaries: [names]});
     handleDataChange([...initiativeOrder, 
-      { id: Math.floor(Math.random()*10000), 
-        name: 'Player ' + (playerNum), 
-        initiative: 0, 
-        ac: null,
-        currentHp: 100, 
+      { id: Math.floor(Math.random()*100000),
+        name: characterName,
+        // name: 'Player ' + (playerNum), 
+        initiative: '', 
+        ac: '',
+        hp: 100, 
         maxHp: 100, 
         tempHP: 0,
-        speed: null,
-        perception: null,
-        fortitude: null,
-        reflex: null,
-        will: null,
+        speed: '',
+        perception: '',
+        fortitude: '',
+        reflex: '',
+        will: '',
         useHealth: true, 
         isPC: isPC, 
         notes: '', 
@@ -59,6 +64,10 @@ const Encounter = () => {
     const newCombatant = {...initiativeOrder[index], id: Math.floor(Math.random()*1000)};
     handleDataChange([...initiativeOrder, newCombatant]);
     setPlayerNum(playerNum + 1);
+  };
+  const handleAddtoLibrary = (index) => {
+    // const newCombatant = {...initiativeOrder[index], id: Math.floor(Math.random()*1000)};
+    addCombatantToLibrary(initiativeOrder[index]);
   };
 
   const nextTurn = () => {
@@ -142,7 +151,14 @@ const Encounter = () => {
       <Link to="/">Back to Manager</Link>
       <h1>{encounter ? encounter.name : 'Loading...'}</h1>
       {isPreCombat ? (
-        <PreCombatSetup setCombatants={handleDataChange} combatants = {initiativeOrder} setIsPreCombat ={setIsPreCombat} addCombatant={addCombatant} removeCombatant={removeCombatant} dupeCombatant={dupeCombatant}/>
+        <PreCombatSetup setCombatants={handleDataChange} 
+          combatants = {initiativeOrder} 
+          setIsPreCombat ={setIsPreCombat} 
+          addCombatant={addCombatant} 
+          removeCombatant={removeCombatant} 
+          dupeCombatant={dupeCombatant}
+          handleAddtoLibrary={handleAddtoLibrary}
+        />
       ): (
         <div>
           <h2>Round: {round}</h2>

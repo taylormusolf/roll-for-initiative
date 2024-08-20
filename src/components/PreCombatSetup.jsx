@@ -6,9 +6,9 @@ import { CombatantLibraryContext } from '../context/CombatantLibraryContext';
 import MonsterDrawer from './MonsterDrawer';
 import monsters from '../assets/data/monsters.json'
 
-const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatant, removeCombatant, dupeCombatant }) => {
+const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatant, removeCombatant, dupeCombatant, handleAddtoLibrary }) => {
     const { id } = useParams();
-    const { library } = useContext(CombatantLibraryContext);
+    const { library, addCombatantToLibrary, removeCombatantFromLibrary } = useContext(CombatantLibraryContext);
     const { updateEncounter} = useContext(EncounterContext);
     const [showMonsterDrawer, setShowMonsterDrawer] = useState(false);
 
@@ -60,8 +60,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                     onChange={(e) => updateCombatant(index, 'initiative', Number(e.target.value))}
                     style={{ marginRight: '10px', width: '80px' }}
                 />
-                {/* <button onClick={()=> updateCombatant(index, 'initiative', generateRandomNumber())}>Rand</button> */}
-                {combatant.useHealth && (
+                {combatant.useHealth && !combatant.isPC && (
                     <>
                         <label>Starting Health: </label>
                         <input
@@ -81,9 +80,10 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                         />
                     </>
                 )}
-                <button onClick={() => updateCombatant(index, 'useHealth', !combatant.useHealth)}>Toggle Health</button>
+                {/* <button onClick={() => updateCombatant(index, 'useHealth', !combatant.useHealth)}>Toggle Health</button> */}
                 <button onClick={() => removeCombatant(index)} style={{ marginLeft: '10px' }}>Remove</button>
                 <button onClick={() => dupeCombatant(index)} style={{ marginLeft: '10px' }}>Duplicate</button>
+                <button onClick={() => handleAddtoLibrary(index)} style={{ marginLeft: '10px' }}>Add to Library</button>
 
                 </div>
             ))}

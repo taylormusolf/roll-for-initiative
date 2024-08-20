@@ -8,7 +8,7 @@ const CombatantLibrary = () => {
 
   const handleAddCombatant = () => {
     addCombatantToLibrary(newCombatant);
-    setNewCombatant({ name: '', initiative: 0, health: 0, maxHealth: 0 });
+    setNewCombatant({ name: '', initiative: null, health: 0, maxHealth: 0 });
   };
 
   return (

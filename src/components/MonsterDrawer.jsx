@@ -53,18 +53,21 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
         id: Math.floor(Math.random()*1000),
         conditions: [],
         name,
-        ac,
-        hp,
-        maxHp: hp,
+        ac: ac.value,
+        hp: hp.value,
+        maxHp: hp.max,
+        tempHp: hp.temp,
         speed,
         perception: mod,
         fortitude,
         reflex,
         will,
-        initiative: 0,
+        initiative: null,
         stats: JSON.stringify(statblock),
         isPC: false,
-        notes: ''
+        notes: '',
+        useHealth: true,
+        cr: level.value
       };
       addMonster(monster);
       closeDrawer();
