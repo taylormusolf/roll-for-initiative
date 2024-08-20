@@ -113,7 +113,7 @@ const Encounter = () => {
 
   const updateHealth = (id, newHealth) => {
     const newOrder = initiativeOrder.map(combatant =>
-      combatant.id === id ? { ...combatant, health: newHealth } : combatant
+      combatant.id === id ? { ...combatant, hp: newHealth } : combatant
     );
     handleDataChange(newOrder);
   };

@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import Modal from 'react-modal';
+import { FaArrowUp, FaArrowDown } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import { IoCloseSharp } from "react-icons/io5";
 
 Modal.setAppElement('#root');
 
@@ -53,7 +56,7 @@ const Combatant = ({
   name,
   initiative,
   ac,
-  currentHp,
+  hp,
   maxHp,
   tempHp,
   speed,
@@ -96,7 +99,7 @@ const Combatant = ({
   const adjustHealth = () => {
     const adjustment = parseInt(healthAdjustment, 10);
     if (!isNaN(adjustment)) {
-      const newHealth = Math.min(maxHp, Math.max(0, health + adjustment));
+      const newHealth = Math.min(maxHp, Math.max(0, hp + adjustment));
       updateHealth(id, newHealth);
     }
     setHealthAdjustment('');
@@ -213,13 +216,13 @@ const Combatant = ({
       </Modal>
         <>
           <button onClick={() => moveUp(id)} style={{ marginRight: '5px' }}>
-            Move Up
+            <FaArrowUp />
           </button>
           <button onClick={() => moveDown(id)} style={{ marginRight: '5px' }}>
-            Move Down
+            <FaArrowDown />
           </button>
           <button onClick={() => removeCombatant(id)} style={{ marginRight: '5px' }}>
-            Remove
+            <IoCloseSharp />
           </button>
         </>
     </div>
