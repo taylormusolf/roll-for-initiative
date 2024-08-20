@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { uniqueNamesGenerator, names } from 'unique-names-generator';
 import { EncounterContext } from '../context/EncounterContext';
 import { CombatantLibraryContext } from '../context/CombatantLibraryContext';
+import { generateRandomID } from '../util/random';
 import Combatant from './Combatant';
 import PreCombatSetup from './PreCombatSetup';
 
@@ -14,9 +15,9 @@ const Encounter = () => {
   const combatants = encounter?.combatants;
   const [round, setRound] = useState(1);
   const [initiativeOrder, setInitiativeOrder] =  useState([]);
+  const [libraryCombatants, setLibraryCombatants] = useState([]);
   const [currentTurn, setCurrentTurn] = useState(0);
   const [isPreCombat, setIsPreCombat] = useState(true);
-  const [playerNum, setPlayerNum] = useState(1);
   const [isModified, setIsModified] = useState(false);
 
   useEffect(()=> {
@@ -25,6 +26,12 @@ const Encounter = () => {
       setIsPreCombat(encounter.isPreCombat);
     }
   }, [combatants])
+  useEffect(()=> {
+    if(library.length){ 
+      setLibraryCombatants(library);
+    }
+  }, [library])
+  
 
   const handleDataChange = (newData) => { //handler that wraps updates to setInitiative that we want to update in localStorage
     setInitiativeOrder(newData);
@@ -37,12 +44,12 @@ const Encounter = () => {
   }, [initiativeOrder, isModified])
 
 
+
   const addCombatant = async(isPC) => {
     const characterName = uniqueNamesGenerator({dictionaries: [names]});
     handleDataChange([...initiativeOrder, 
-      { id: Math.floor(Math.random()*100000),
+      { id: generateRandomID(),
         name: characterName,
-        // name: 'Player ' + (playerNum), 
         initiative: '', 
         ac: '',
         hp: 100, 
@@ -58,17 +65,20 @@ const Encounter = () => {
         notes: '', 
         conditions: [] 
       }])
-    setPlayerNum(playerNum + 1);
   };
   const dupeCombatant = (index) => {
-    const newCombatant = {...initiativeOrder[index], id: Math.floor(Math.random()*1000)};
+    const newCombatant = {...initiativeOrder[index], id: generateRandomID()};
     handleDataChange([...initiativeOrder, newCombatant]);
     setPlayerNum(playerNum + 1);
   };
   const handleAddtoLibrary = (index) => {
-    // const newCombatant = {...initiativeOrder[index], id: Math.floor(Math.random()*1000)};
+    // const newCombatant = {...initiativeOrder[index], id: generateRandomID()};
     addCombatantToLibrary(initiativeOrder[index]);
   };
+  const handleRemoveFromLibrary = (index) => {
+    setLibraryCombatants(libraryCombatants.filter((_, i) => i !== index));
+    removeCombatantFromLibrary(index)
+  }
 
   const nextTurn = () => {
     const newOrder = [...initiativeOrder];
@@ -134,7 +144,6 @@ const Encounter = () => {
 
   const removeCombatant = (index) => {
     const updatedCombatants = initiativeOrder.filter((_, i) => i !== index);
-    console.log(updatedCombatants)
     handleDataChange(updatedCombatants);
     if (currentTurn >= updatedCombatants.length) {
       setCurrentTurn(updatedCombatants.length - 1);
@@ -158,6 +167,8 @@ const Encounter = () => {
           removeCombatant={removeCombatant} 
           dupeCombatant={dupeCombatant}
           handleAddtoLibrary={handleAddtoLibrary}
+          libraryCombatants={libraryCombatants}
+          handleRemoveFromLibrary={handleRemoveFromLibrary}
         />
       ): (
         <div>

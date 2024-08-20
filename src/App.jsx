@@ -7,7 +7,9 @@ import EncounterProvider from './context/EncounterContext';
 import CombatantLibraryProvider from './context/CombatantLibraryContext';
 import CombatantLibrary from './components/CombatantLibrary';
 
-console.log('localstorage-encounters', localStorage.getItem('encounters'))
+// console.log('localstorage-encounters', localStorage.getItem('encounters'))
+// console.log('localstorage-library', localStorage.getItem('combatantLibrary'))
+
 
 const App = () => (
   <EncounterProvider>

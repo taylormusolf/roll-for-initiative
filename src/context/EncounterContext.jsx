@@ -5,7 +5,7 @@ export const EncounterContext = createContext();
 
 const EncounterProvider = ({ children }) => {
   const [encounters, setEncounters] = useState([]);
-  const [encountersPulled, setEncountersPulled] = useState(false);
+  // const [encountersPulled, setEncountersPulled] = useState(false);
   const didMount = useRef(false);
 
   // Load encounters from local storage
@@ -18,7 +18,7 @@ const EncounterProvider = ({ children }) => {
   useEffect(() => {
     if(didMount.current){ //makes useEffect calls to update local storage wait until at least second render
       localStorage.setItem('encounters', JSON.stringify(encounters));
-      setEncountersPulled(true);
+      // setEncountersPulled(true);
     } else {
       didMount.current = true;
     }
@@ -40,7 +40,7 @@ const EncounterProvider = ({ children }) => {
   };
 
   return (
-    <EncounterContext.Provider value={{ encounters, addEncounter, updateEncounter, deleteEncounter, encountersPulled }}>
+    <EncounterContext.Provider value={{ encounters, addEncounter, updateEncounter, deleteEncounter}}>
       {children}
     </EncounterContext.Provider>
   );

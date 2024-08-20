@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import MonsterStatBlock from './MonsterStatBlock';
 import './MonsterDrawer.scss';
+import { generateRandomID } from '../util/random';
 
 const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
   const [currentView, setCurrentView] = useState('folders');
@@ -50,7 +51,7 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
           } = statblock;
 
       const monster = {
-        id: Math.floor(Math.random()*1000),
+        id: generateRandomID(),
         conditions: [],
         name,
         ac: ac.value,
@@ -73,6 +74,23 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
       closeDrawer();
     }
   };
+
+  const textParse = (text) => {
+    const arr = text.split('-');
+    const preps = ['of', 'the'];
+    for(let i = 0; i < arr.length; i++){
+      if(i === 0){
+        arr[i] = arr[i][0].toUpperCase() + arr[i].slice(1);
+      } else {
+        if(!preps.includes(arr[i])){
+          arr[i] = arr[i][0].toUpperCase() + arr[i].slice(1);
+        }
+      }
+    }
+    return arr.join(' ');
+  }
+
+
   return (
     <div className="monster-drawer">
       <button onClick={closeDrawer}>Close</button>
@@ -82,7 +100,7 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
           <h3>Select a Bestiary</h3>
           <ul>
             {Object.keys(monsters).map((bestiary) => (
-              <li key={bestiary} onClick={() => handleBestiaryClick(bestiary)}>{bestiary}</li>
+              <li key={bestiary} onClick={() => handleBestiaryClick(bestiary)}>{textParse(bestiary)}</li>
             ))}
           </ul>
         </div>
@@ -92,7 +110,7 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
           <h3>Select an NPC</h3>
           <ul>
             {monsters[selectedBestiary].map((name) => (
-              <li key={name} onClick={() => handleNameClick(name)}>{name}</li>
+              <li key={name} onClick={() => handleNameClick(name)}>{textParse(name)}</li>
             ))}
           </ul>
         </div>

@@ -2,13 +2,11 @@ import React, { useState, useContext, useEffect } from 'react';
 import { generateRandomNumber } from '../util/random';
 import { useParams } from 'react-router-dom';
 import { EncounterContext } from '../context/EncounterContext';
-import { CombatantLibraryContext } from '../context/CombatantLibraryContext';
 import MonsterDrawer from './MonsterDrawer';
 import monsters from '../assets/data/monsters.json'
 
-const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatant, removeCombatant, dupeCombatant, handleAddtoLibrary }) => {
+const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatant, removeCombatant, dupeCombatant, handleAddtoLibrary, libraryCombatants, handleRemoveFromLibrary }) => {
     const { id } = useParams();
-    const { library, addCombatantToLibrary, removeCombatantFromLibrary } = useContext(CombatantLibraryContext);
     const { updateEncounter} = useContext(EncounterContext);
     const [showMonsterDrawer, setShowMonsterDrawer] = useState(false);
 
@@ -21,6 +19,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
     };
     
     const addCombatantFromLibrary = (combatant) => {
+        const newCombatant = {}
         setCombatants([...combatants, combatant]);
     };
     const addMonster = (monster) => {
@@ -39,7 +38,6 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
         ))
         setCombatants(updatedCombatants);
     }
-
     return (
         <div>
             <h2>Set Up Combatants</h2>
@@ -96,10 +94,11 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
             </button>
             <div>
                 <h3>Add from Library</h3>
-                {library.map((combatant, index) => (
+                {libraryCombatants.map((combatant, index) => (
                 <div key={index}>
                     <p>{combatant.name}</p>
                     <button onClick={() => addCombatantFromLibrary(combatant)}>Add to Encounter</button>
+                    <button onClick={() => handleRemoveFromLibrary(index)}>Remove From Library</button>
                 </div>
                 ))}
             </div>
