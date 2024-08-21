@@ -8,7 +8,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
     const [adjustment, setAdjustment] = useState('standard');
     useEffect(()=> {
         if(!block){
-            const url = `http://taylormusolf.com/pf2e/packs/${selectedBestiary}/${selectedName}.json`
+            const url = `https://taylormusolf.com/pf2e/packs/${selectedBestiary}/${selectedName}.json`
             fetch(url).then(res => res.json()).then(dat => setData(dat))
         }
     }, [selectedName])
