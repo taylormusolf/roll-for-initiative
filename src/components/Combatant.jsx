@@ -3,6 +3,7 @@ import Modal from 'react-modal';
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { IoCloseSharp } from "react-icons/io5";
+import MonsterStatBlock from './MonsterStatBlock';
 
 Modal.setAppElement('#root');
 
@@ -18,6 +19,22 @@ const customStyles = {
     borderRadius: '10px',
     width: '300px',
     backgroundColor: 'rgb(51,51,51)',
+  },
+  overlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+  },
+};
+const customStyles2 = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    height: '75%',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    padding: '20px',
+    backgroundColor: 'white',
+    overflow: 'auto'
   },
   overlay: {
     backgroundColor: 'rgba(0, 0, 0, 0.75)',
@@ -67,6 +84,8 @@ const Combatant = ({
   useHealth,
   isPC,
   notes,
+  stats,
+  cr,
   conditions,
   isCurrent,
   moveUp,
@@ -76,7 +95,8 @@ const Combatant = ({
   updateConditions,
   removeCombatant
 }) => {
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [conditionsModalIsOpen, setConditionsModalIsOpen] = useState(false);
+  const [statBlockModalIsOpen, setStatBlockModalIsOpen] = useState(false);
   const [healthAdjustment, setHealthAdjustment] = useState('');
 
   const toggleCondition = (conditionName) => {
@@ -114,7 +134,7 @@ const Combatant = ({
         style={{ fontWeight: isCurrent ? 'bold' : 'normal', marginRight: '10px', width: '100px' }}
       />
       <p style={{ marginRight: '10px' }}>Initiative: {initiative}</p>
-      {useHealth &&(
+      {!isPC && useHealth &&(
         <>
           <div style={healthBarContainerStyle}>
             <div style={healthBarStyle(hp, maxHp)} />
@@ -143,12 +163,12 @@ const Combatant = ({
           </span>
         ))}
       </div>
-      <button onClick={() => setModalIsOpen(true)} style={{ marginRight: '10px' }}>
+      <button onClick={() => setConditionsModalIsOpen(true)} style={{ marginRight: '10px' }}>
         Conditions
       </button>
       <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={() => setModalIsOpen(false)}
+        isOpen={conditionsModalIsOpen}
+        onRequestClose={() => setConditionsModalIsOpen(false)}
         style={customStyles}
         contentLabel="Conditions"
       >
@@ -212,9 +232,10 @@ const Combatant = ({
             )}
           </div>
         ))}
-        <button onClick={() => setModalIsOpen(false)}>Close</button>
+        <button onClick={() => setConditionsModalIsOpen(false)}>Close</button>
       </Modal>
         <>
+          {stats && (<button onClick={() => setStatBlockModalIsOpen(true)}>SB</button>)}
           <button onClick={() => moveUp(id)} style={{ marginRight: '5px' }}>
             <FaArrowUp />
           </button>
@@ -225,6 +246,15 @@ const Combatant = ({
             <IoCloseSharp />
           </button>
         </>
+        <Modal
+         isOpen={statBlockModalIsOpen}
+         onRequestClose={() => setStatBlockModalIsOpen(false)}
+         style={customStyles2}
+         contentLabel="Stat-block"
+         >
+          <MonsterStatBlock block={stats}/>
+          <button onClick={() => setStatBlockModalIsOpen(false)}>Close</button>
+        </Modal>
     </div>
   );
 };

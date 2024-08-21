@@ -4,7 +4,7 @@ import './MonsterStatBlock.scss';
 //selectedBestiary, selectedName, setStatblock will be used at NPC creation
 //block will be used to look at stats after creation
 const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }) => {
-    const [data, setData] = useState(block);
+    const [data, setData] = useState(block ? JSON.parse(block) : undefined);
     useEffect(()=> {
         if(!block){
             const url = `http://taylormusolf.com/pf2e/packs/${selectedBestiary}/${selectedName}.json`
@@ -12,7 +12,9 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
         }
     }, [selectedName])
     useEffect(()=> {
-        setStatblock(data)
+        if(!block){
+            setStatblock(data)
+        }
     }, [data])
     if(data === undefined) return null;
   const {
@@ -53,40 +55,48 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
     }
     return action[type];
   }
-  function knowledgeCheck(mType, mRarity){
-    mType = mType.toLowerCase()
+  function knowledgeCheck(mTypes, mRarity){
+      const type = {
+          'aberration': ['occultism'],
+          'animal': ['nature'],
+          'astral': ['occultism'],
+          'beast': ['arcana', 'nature'],
+          'celestial': ['religion'],
+          'construct': ['arcana', 'crafting'],
+          'dragon': ['arana'],
+          'dream': ['occultism'],
+          'elemental': ['arcana', 'nature'],
+          'ethereal': ['occultism'],
+          'fey': ['nature'],
+          'fiend': ['religion'],
+          'fungus': ['nature'],
+          'humanoid': ['society'],
+          'monitor': ['religion'],
+          'ooze': ['occultism'],
+          'plant': ['nature'],
+          'shade': ['religion'],
+          'spirit': ['occultism'],
+          'time': ['occultims'],
+          'undead': ['religion']
+      }
+    let matchingTypes = mTypes.filter((value) => value in type);
+    let knowledgeTypes = matchingTypes.map((mType) => type[mType]);
     mRarity = mRarity.toLowerCase()
-    const type = {
-        'aberration': ['occultism'],
-        'animal': ['nature'],
-        'astral': ['occultism'],
-        'beast': ['arcana', 'nature'],
-        'celestial': ['religion'],
-        'construct': ['arcana', 'crafting'],
-        'dragon': ['arana'],
-        'dream': ['occultism'],
-        'elemental': ['arcana', 'nature'],
-        'ethereal': ['occultism'],
-        'fey': ['nature'],
-        'fiend': ['religion'],
-        'fungus': ['nature'],
-        'humanoid': ['society'],
-        'monitor': ['religion'],
-        'ooze': ['occultism'],
-        'plant': ['nature'],
-        'shade': ['religion'],
-        'spirit': ['occultism'],
-        'time': ['occultims'],
-        'undead': ['religion']
-    }
     const rarity = {
         'common': 15,
         'uncommon': 17,
         'rare': 20,
         'unique': 25
     }
-    return `${mType} (${type[mType].join(', ')}): DC ${rarity[mRarity]}`
+    return `${matchingTypes.join(', ')} (${knowledgeTypes.join(', ')}): DC ${rarity[mRarity]}`
   }
+  const lores = items.filter(item => item.type === 'lore');
+  const weapons = items.filter(item => item.type === 'weapon');
+  const melees = items.filter(item => item.type === 'melee');
+  const actionsItems = items.filter(item => item.type === 'action');
+  const spells = items.filter(item => item.type === 'spell');
+  const spellcastingEntry = items.filter(item => item.type === 'spellcastingEntry');
+
 
   return (
     <div className="monster-stat-block">
@@ -94,8 +104,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
             <h1>{name.toUpperCase()}</h1>
             <h1>CREATURE {level.value}</h1>
         </div>
-        {/* add a recall knowledge */}
-        {/* <div><label>Recall Knowledge</label>{knowledgeCheck()}</div> */}
+        {console.log(data)}
         <div className='misc-stats'>
             <div className="traits">
                 <div className='traits-size'>{rarity.toUpperCase()}</div>
@@ -107,71 +116,83 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
             <div className="perception">
                 <label>Perception</label>
                 <div>{`+${mod}; `}</div>
-                {senses?.map((t, i)=>{
-                    return(
-                        <React.Fragment key={t.type}> 
-                            {!!i && ", "} 
-                            <div> 
-                                {t.type}
-                            </div>
-                        </React.Fragment>
-                    ) 
-                })}
-                {' '}
-                <div>{details}</div>
+                <div style={{paddingLeft: '5px'}}>
+                    {details ? 
+                        senses?.map(sense => sense.type).concat(details).join(', ')
+                        :
+                        senses?.map(sense => sense.type).join(', ')
+                    }
+                </div>
+                
             </div>
-            <div className="languages">
+            <div className="perception"><label>Recall Knowledge</label>{knowledgeCheck(value, rarity)}</div>
+            {!!languages?.value.length && <div className="languages">
                 <label>Languages</label>
                 <ul className="languages-list">
-                    {languages?.value.map((language, index) => (
-                        <li key={index}>{language.charAt(0).toLocaleUpperCase() + language.slice(1)}</li>
-                    ))}
-                    {languages.details}
+                    {
+                        languages.details ? 
+                            languages?.value.map((language) => (
+                                language.charAt(0).toLocaleUpperCase() + language.slice(1)
+                            )).concat(languages.details).join(', ')
+                        :
+                        languages?.value.map((language) => (
+                            language.charAt(0).toLocaleUpperCase() + language.slice(1)
+                        )).join(', ')
+                    }
                 </ul>
-            </div>
+            </div>}
             <div className="skills">
                 <label>Skills</label>
-                {Object.keys(skills)?.map((skill, index) => (
-                    <li key={index}>{`${skill.charAt(0).toLocaleUpperCase() + skill.slice(1)} +${skills[skill].base}`}</li>
-                ))}
+                {lores.length ? 
+                    Object.keys(skills)?.map((skill) => (
+                        `${skill.charAt(0).toLocaleUpperCase() + skill.slice(1)} +${skills[skill].base}`
+                    )).concat(lores.map(lore => `${lore.name} +${lore.system.mod.value}`)).join(', ')
+                :
+                    Object.keys(skills)?.map((skill) => (
+                        `${skill.charAt(0).toLocaleUpperCase() + skill.slice(1)} +${skills[skill].base}`
+                    )).join(', ')
+                }
             </div>
             <div className="abilities">
-                <ul className='abilities-list'>
-                    <li key={'Str'}><label>Str</label>{`${abilities['str'].mod > 0 ? '+':''}${abilities['str'].mod},`}</li>
-                    <li key={'Dex'}><label>Dex</label>{`${abilities['dex'].mod > 0 ? '+':''}${abilities['dex'].mod},`}</li>
-                    <li key={'Con'}><label>Con</label>{`${abilities['con'].mod > 0 ? '+':''}${abilities['con'].mod},`}</li>
-                    <li key={'Int'}><label>Int</label>{`${abilities['int'].mod > 0 ? '+':''}${abilities['int'].mod},`}</li>
-                    <li key={'Wis'}><label>Wis</label>{`${abilities['wis'].mod > 0 ? '+':''}${abilities['wis'].mod},`}</li>
-                    <li key={'Cha'}><label>Cha</label>{`${abilities['cha'].mod > 0 ? '+':''}${abilities['cha'].mod}`}</li>
-                </ul>
+                <div className='abilities-list'>
+                    <div key={'Str'}><label>Str</label>{`${abilities['str'].mod >= 0 ? '+':''}${abilities['str'].mod},`}</div>
+                    <div key={'Dex'}><label>Dex</label>{`${abilities['dex'].mod >= 0 ? '+':''}${abilities['dex'].mod},`}</div>
+                    <div key={'Con'}><label>Con</label>{`${abilities['con'].mod >= 0 ? '+':''}${abilities['con'].mod},`}</div>
+                    <div key={'Int'}><label>Int</label>{`${abilities['int'].mod >= 0 ? '+':''}${abilities['int'].mod},`}</div>
+                    <div key={'Wis'}><label>Wis</label>{`${abilities['wis'].mod >= 0 ? '+':''}${abilities['wis'].mod},`}</div>
+                    <div key={'Cha'}><label>Cha</label>{`${abilities['cha'].mod >= 0 ? '+':''}${abilities['cha'].mod}`}</div>
+                </div>
             </div>
             <div className='special'>
                 <label></label>
             </div>
-            {/* <div className="items">
+            {
+             !!weapons?.length &&<div className="items">
                 <label>Items</label>
-            </div> */}
+                {weapons.map((weapon) => weapon.system.baseItem).join(' ,')}
+            </div>
+            }
         </div>
         <div className="defense">
             <div className="defense-top-line">
-                <li><label>AC</label>{ac.value};</li>
-                <li><label>Fort</label>{`+${fortitude.value}`}</li>
-                <li><label>Ref</label>{`+${reflex.value}`}</li> 
-                <li><label>Will</label>{`+${will.value}`}</li> 
-                <li>{`; ${allSaves.value}`}</li> 
+                <li><label>AC</label>{`${ac.value};`}</li>
+                <li><label>Fort</label>{`+${fortitude.value},`}</li>
+                <li><label>Ref</label>{`+${reflex.value},`}</li> 
+                <li><label>Will</label>{allSaves.value ? `+${will.value};` : `+${will.value}`}</li> 
+                <li>{` ${allSaves.value}`}</li> 
             </div>
             <div className="defense-top-line">
-                <div><label>HP</label>{hp.max};</div>    
-                {immunities?.length && <div className="immunities">
+                <div><label>HP</label>{`${hp.max}; `}</div>    
+                {!!immunities?.length && <div className="immunities">
                     <ul className='immunities-list'>
                         <label>Immunities</label>
-                        {immunities?.map((immunity, index) => (
-                            <li key={index}>{immunity.type}</li>
-                        ))}
+                        {immunities?.map((immunity) => (
+                            immunity.type.split('-').join(' ')
+                        )).join(', ')}
                     </ul>
                 </div>}
             </div>
-            {resistances?.length && <div className="resistances">
+            {!!resistances?.length && <div className="resistances">
                 <label>Resistances</label>
                 <ul className='resistances-list'>
                 {resistances?.map((resistance, index) => (
@@ -179,7 +200,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
                 ))}
                 </ul>
             </div>}
-            {weaknesses?.length && <div className="weaknesses">
+            {!!weaknesses?.length && <div className="weaknesses">
                 <label>Weaknesses</label>
                 <ul className='weaknesses-list'>
                 {weaknesses?.map((weakness, index) => (
@@ -198,39 +219,37 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
 
         </div>
         <div className="items">
-            {/* {console.log(items)} */}
             <ul className="items-list">
+                <div className="melee-list">
+                    {!!melees.length && <label>Melee{actions(1)}</label>}
+                    {melees?.map((melee, index)=>{
+                        const {damageRolls} = melee.system;
+                        return(
+                            <div key={index}>
+                                <div>
+                                    {[melee.name.toLowerCase(), `+${melee.system.bonus.value}`].join(' ')
+                                    .concat([' ('])
+                                    .concat(melee.system.traits.value?.map(trait => trait.split('-').join(' ')).join(', '))
+                                    .concat(['), '])}
+                                    {Object.values(damageRolls)?.map((damageRoll, index) => 
+                                        <div key={index}><label>Damage</label>{`${damageRoll.damage} ${damageRoll.damageType}`}</div>
+                                    )}
+                                </div>
+                            </div>
+                    )})}
+                </div>
+                <div className="spell-list">
+                    {spellcastingEntry.map((spellcast)=> (
+                        `${spellcast.name} DC${spellcast.system.spelldc.dc}`
+                        ))
+                        .concat(['; '])
+                        .concat(spells.map((spell)=> (
+                            `${spellNumber(spell.system.level.value)} ${spell.name.toLowerCase()}`)
+                        ).join('; ')   
+                    )}
+                </div>
                 {items?.map((item) => {
-                    if(item.type === 'spell'){
-                        return (
-                        <li key={item._id}>
-                        <p><label>{spellNumber(item.system.level.value)}</label>{item.name.toLowerCase()};</p>
-                        {/* <p>{item.system.description.value}</p> */}
-
-                        </li>
-                        )
-
-                    }else if(item.type === 'melee'){
-                        const {damageRolls} = item.system;
-                        return (
-                            <li key={item._id}>
-                                <label>Melee</label>
-                                <p>{item.name.toLowerCase()}</p>
-                                <p>+{item.system.bonus.value}</p>
-                                <ul className='item-desc'>(
-                                    {item.system.traits.value?.map((trait, index) => (
-                                        <div key={index}>{trait}</div>
-                                    ))}
-                                )</ul>
-                                <ul className='item-desc'>
-                                    {Object.values(damageRolls)?.map((damageRoll, index) => (
-                                        <div key={index}><label>Damage</label>{damageRoll.damage}{damageRoll.damageType}</div>
-                                    ))}
-                                </ul>
-                            </li>
-                        )
-
-                    }else if(item.type === 'action'){
+                    if(item.type === 'action'){
                         return (
                             <li key={item._id}>
                                 <label>{item.name}</label>
@@ -239,13 +258,6 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
                             </li>
                         )
 
-                    }else if(item.type === 'spellcastingEntry'){
-                        return (
-                            <div className='item-list' key={item._id}>
-                                <label>{item.name}</label>
-                                <div>DC {item.system.spelldc.dc}</div>
-                            </div>
-                        )
                     }
                 })}
             </ul>

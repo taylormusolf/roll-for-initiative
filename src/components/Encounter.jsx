@@ -97,8 +97,10 @@ const Encounter = () => {
   };
 
   const prevTurn = () => {
-    setCurrentTurn((currentTurn - 1 + initiativeOrder.length) % initiativeOrder.length);
-    if (currentTurn === 0) {
+    if (currentTurn !== 0 || round > 1) {
+      setCurrentTurn((currentTurn - 1 + initiativeOrder.length) % initiativeOrder.length);
+    }
+    if (currentTurn === 0 && round > 1) {
       setRound(round - 1);
     }
   };

@@ -1,4 +1,3 @@
-// CombatantLibrary.js
 import React, { useContext, useState } from 'react';
 import { CombatantLibraryContext } from '../context/CombatantLibraryContext';
 

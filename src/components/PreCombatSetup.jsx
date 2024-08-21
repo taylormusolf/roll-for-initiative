@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { EncounterContext } from '../context/EncounterContext';
 import MonsterDrawer from './MonsterDrawer';
 import monsters from '../assets/data/monsters.json'
+import './PreCombatSetup.scss'
 
 const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatant, removeCombatant, dupeCombatant, handleAddtoLibrary, libraryCombatants, handleRemoveFromLibrary }) => {
     const { id } = useParams();
@@ -93,12 +94,14 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                 Start Encounter
             </button>
             <div>
-                <h3>Add from Library</h3>
+                <h3>Combatant Library</h3>
                 {libraryCombatants.map((combatant, index) => (
                 <div key={index}>
-                    <p>{combatant.name}</p>
-                    <button onClick={() => addCombatantFromLibrary(combatant)}>Add to Encounter</button>
-                    <button onClick={() => handleRemoveFromLibrary(index)}>Remove From Library</button>
+                    <div className='library-index'> 
+                        <p>{combatant.name}</p>
+                        <button onClick={() => addCombatantFromLibrary(combatant)}>Add to Encounter</button>
+                        <button onClick={() => handleRemoveFromLibrary(index)}>Remove From Library</button>
+                    </div>
                 </div>
                 ))}
             </div>

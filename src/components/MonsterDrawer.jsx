@@ -1,8 +1,8 @@
-// MonsterDrawer.js
 import React, { useState } from 'react';
 import MonsterStatBlock from './MonsterStatBlock';
 import './MonsterDrawer.scss';
 import { generateRandomID } from '../util/random';
+import { FaWindowClose } from "react-icons/fa";
 
 const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
   const [currentView, setCurrentView] = useState('folders');
@@ -52,8 +52,9 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
 
       const monster = {
         id: generateRandomID(),
-        conditions: [],
         name,
+        conditions: [],
+        initiative: '',
         ac: ac.value,
         hp: hp.value,
         maxHp: hp.max,
@@ -63,11 +64,10 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
         fortitude,
         reflex,
         will,
-        initiative: null,
-        stats: JSON.stringify(statblock),
+        useHealth: true,
         isPC: false,
         notes: '',
-        useHealth: true,
+        stats: JSON.stringify(statblock),
         cr: level.value
       };
       addMonster(monster);
@@ -93,8 +93,11 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
 
   return (
     <div className="monster-drawer">
-      <button onClick={closeDrawer}>Close</button>
-      {currentView !== 'folders' && <button onClick={handleBackClick}>Back</button>}
+      <div className='monster-drawer-buttons'>
+        <button onClick={closeDrawer}><FaWindowClose /></button>
+        {currentView !== 'folders' && <button onClick={handleBackClick}>Back</button>}
+        {currentView === 'preview' && selectedName && <button onClick={handleAddMonster}>Add NPC</button>}
+      </div>
       {currentView === 'folders' && (
         <div>
           <h3>Select a Bestiary</h3>
@@ -117,7 +120,6 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
       )}
       {currentView === 'preview' && selectedName && (
         <div>
-          <button onClick={handleAddMonster}>Add NPC</button>
           <MonsterStatBlock selectedBestiary={selectedBestiary} selectedName={selectedName} setStatblock={setStatblock} />
         </div>
       )}
