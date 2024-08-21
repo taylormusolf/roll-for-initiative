@@ -15,7 +15,7 @@ const App = () => (
   <EncounterProvider>
     <CombatantLibraryProvider>
       <h1>Roll for Initiative</h1>
-      <Router>
+      <Router basename='/roll-for-initiative'>
           <Routes>
             <Route path="/" exact element={<EncounterManager/>} />
             <Route path="/encounter/:id" element={<Encounter/>} />
