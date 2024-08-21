@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Modal from 'react-modal';
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
-import { MdDelete } from "react-icons/md";
 import { IoCloseSharp } from "react-icons/io5";
 import MonsterStatBlock from './MonsterStatBlock';
 

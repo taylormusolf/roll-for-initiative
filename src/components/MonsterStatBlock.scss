@@ -3,7 +3,7 @@
     padding: 20px;
     max-width: 600px;
     margin: auto;
-    background-color: #f8f8f8;
+    background-color: white;
     color: black;
     label {
       font-weight: 700;
@@ -11,7 +11,7 @@
     }
     li {
       padding-right: .25rem;
-      padding-top: 5px;
+      // padding-top: 5px;
     }
   }
   
@@ -79,4 +79,14 @@
   padding-right: 5px;
 }
 
-  
+.melee-list{
+  flex-direction: column;
+}  
+.melee-item{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.notes, .actions{
+  padding-top: 5px;
+}

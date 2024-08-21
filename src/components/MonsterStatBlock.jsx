@@ -5,6 +5,7 @@ import './MonsterStatBlock.scss';
 //block will be used to look at stats after creation
 const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }) => {
     const [data, setData] = useState(block ? JSON.parse(block) : undefined);
+    const [adjustment, setAdjustment] = useState('standard');
     useEffect(()=> {
         if(!block){
             const url = `http://taylormusolf.com/pf2e/packs/${selectedBestiary}/${selectedName}.json`
@@ -17,12 +18,15 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
         }
     }, [data])
     if(data === undefined) return null;
+    const handleSelectAdjustment = (e) => {
+        setAdjustment(e.target.value);
+    }
   const {
     img,
     name,
     system: {
       abilities,
-      attributes: { ac, hp, immunities, resistances, speed, allSaves, weaknesses },
+      attributes: { ac, hp, immunities, resistances, speed, allSaves, weaknesses, hardness },
       details: { languages, level, publicNotes },
       initiative: {statistic},
       perception: {details, mod, senses},
@@ -88,21 +92,86 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
         'rare': 20,
         'unique': 25
     }
-    return `${matchingTypes.join(', ')} (${knowledgeTypes.join(', ')}): DC ${rarity[mRarity]}`
+    return <p><label>Recall Knowledge</label>{`${matchingTypes.join(', ')} (${knowledgeTypes.join(', ')}): DC ${rarity[mRarity]}, unspecific lore: DC ${rarity[mRarity] - 2}, specific lore: DC ${rarity[mRarity] - 5}`} </p>
   }
+  const levelAdjustment = (level)=> {
+    if(adjustment === 'standard'){
+        return level;
+    } else if(adjustment === 'weak'){
+        if(level === 1){
+            return level - 2;
+        }else {
+            return level - 1;
+        }
+    } else {
+        if(level <= 0){
+            return level + 2;
+        } else {
+            return level + 1;
+        }
+    }
+  }
+  const skillAdjustment = (value) => {
+    if(adjustment === 'standard'){
+        return value;
+    } else if(adjustment === 'weak'){
+        return value - 2;
+    } else {
+        return value + 2;
+    }
+  }
+  const hpAdjustment = (hp, level) => {
+    if(adjustment === 'standard'){
+        return hp;
+    } else if(adjustment === 'weak'){
+        if(level <= 2){
+            return hp - 10;
+        } else if(level <= 5){
+            return hp - 15;
+        } else if(level <= 20){
+            return hp - 20;
+        } else {
+            return hp - 30;
+        }
+    } else { //elite
+        if(level <= 1){
+            return hp + 10;
+        } else if(level <= 4){
+            return hp + 15;
+        } else if(level <= 19){
+            return hp + 20;
+        } else {
+            return hp + 30;
+        }
+    }
+  }
+
+  const ptagParse = (str) => {
+    return str.replace(/<\/?p>/g, '');
+  }
+
+  const rituals = items.filter(item => item.type === 'ritual');
   const lores = items.filter(item => item.type === 'lore');
   const weapons = items.filter(item => item.type === 'weapon');
   const melees = items.filter(item => item.type === 'melee');
-  const actionsItems = items.filter(item => item.type === 'action');
+  const actionItems = items.filter(item => item.type === 'action');
   const spells = items.filter(item => item.type === 'spell');
   const spellcastingEntry = items.filter(item => item.type === 'spellcastingEntry');
 
 
   return (
     <div className="monster-stat-block">
+        <div>
+            <label htmlFor="options">Adjustment:</label>
+            <select id="options" value={adjustment} onChange={handleSelectAdjustment}>
+                <option value="elite">Elite</option>
+                <option value="weak">Weak</option>
+                <option value="standard">Standard</option>
+            </select>
+        </div>
         <div className="header">
-            <h1>{name.toUpperCase()}</h1>
-            <h1>CREATURE {level.value}</h1>
+            <h1>{(adjustment === 'weak' ? 'WEAK ': adjustment === 'elite' ? 'ELITE ' : '') + name.toUpperCase()}</h1>
+            <h1>CREATURE {levelAdjustment(level.value)}</h1>
         </div>
         {console.log(data)}
         <div className='misc-stats'>
@@ -115,7 +184,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
             </div>
             <div className="perception">
                 <label>Perception</label>
-                <div>{`+${mod}; `}</div>
+                <div>{`+${skillAdjustment(mod)}; `}</div>
                 <div style={{paddingLeft: '5px'}}>
                     {details ? 
                         senses?.map(sense => sense.type).concat(details).join(', ')
@@ -125,7 +194,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
                 </div>
                 
             </div>
-            <div className="perception"><label>Recall Knowledge</label>{knowledgeCheck(value, rarity)}</div>
+            <div className="perception">{knowledgeCheck(value, rarity)}</div>
             {!!languages?.value.length && <div className="languages">
                 <label>Languages</label>
                 <ul className="languages-list">
@@ -146,10 +215,10 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
                 {lores.length ? 
                     Object.keys(skills)?.map((skill) => (
                         `${skill.charAt(0).toLocaleUpperCase() + skill.slice(1)} +${skills[skill].base}`
-                    )).concat(lores.map(lore => `${lore.name} +${lore.system.mod.value}`)).join(', ')
+                    )).concat(lores.map(lore => `${lore.name} +${skillAdjustment(lore.system.mod.value)}`)).join(', ')
                 :
                     Object.keys(skills)?.map((skill) => (
-                        `${skill.charAt(0).toLocaleUpperCase() + skill.slice(1)} +${skills[skill].base}`
+                        `${skill.charAt(0).toLocaleUpperCase() + skill.slice(1)} +${skillAdjustment(skills[skill].base)}`
                     )).join(', ')
                 }
             </div>
@@ -175,14 +244,28 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
         </div>
         <div className="defense">
             <div className="defense-top-line">
-                <li><label>AC</label>{`${ac.value};`}</li>
-                <li><label>Fort</label>{`+${fortitude.value},`}</li>
-                <li><label>Ref</label>{`+${reflex.value},`}</li> 
-                <li><label>Will</label>{allSaves.value ? `+${will.value};` : `+${will.value}`}</li> 
+                <li><label>AC</label>
+                    {!!ac.details.length ?
+                    `${skillAdjustment(ac.value) + ' ' + ac.details};`
+                    :
+                    `${skillAdjustment(ac.value)};`
+                    }
+                    
+                </li>
+                <li><label>Fort</label>{`+${skillAdjustment(fortitude.value)},`}</li>
+                <li><label>Ref</label>{`+${skillAdjustment(reflex.value)},`}</li> 
+                <li><label>Will</label>{allSaves.value ? `+${skillAdjustment(will.value)};` : `+${skillAdjustment(will.value)}`}</li> 
                 <li>{` ${allSaves.value}`}</li> 
             </div>
             <div className="defense-top-line">
-                <div><label>HP</label>{`${hp.max}; `}</div>    
+                <div>
+                    {hardness?.value ? 
+                        <div><label>HP</label>{`${hpAdjustment(hp.max, level.value)}; `} <label>Hardness:</label>{`${hardness.value}`} </div>
+                    :
+                        <div><label>HP</label>{`${hpAdjustment(hp.max, level.value)}; `}</div>
+                    }
+
+                </div>    
                 {!!immunities?.length && <div className="immunities">
                     <ul className='immunities-list'>
                         <label>Immunities</label>
@@ -210,7 +293,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
             </div>}
         </div>
         <div className='offense'>
-            <div><label>Speed</label>{speed.value} feet,</div>
+            <div><label>Speed</label>{speed.value} feet{!!speed.otherSpeeds.length && ','}</div>
             <ul className='speeds-list'>
                 {speed.otherSpeeds?.map((speed, index) => (
                     <li key={index}>{`${speed.type} ${speed.value} feet`}</li>
@@ -221,49 +304,54 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
         <div className="items">
             <ul className="items-list">
                 <div className="melee-list">
-                    {!!melees.length && <label>Melee{actions(1)}</label>}
                     {melees?.map((melee, index)=>{
                         const {damageRolls} = melee.system;
                         return(
                             <div key={index}>
-                                <div>
-                                    {[melee.name.toLowerCase(), `+${melee.system.bonus.value}`].join(' ')
-                                    .concat([' ('])
-                                    .concat(melee.system.traits.value?.map(trait => trait.split('-').join(' ')).join(', '))
-                                    .concat(['), '])}
+                                <div className='melee-item'>
+                                    <label>Melee{actions(1)}</label>
+                                    <p>
+                                        {[melee.name.toLowerCase(), `+${skillAdjustment(melee.system.bonus.value)}`].join(' ')
+                                        .concat([' ('])
+                                        .concat(melee.system.traits.value?.map(trait => trait.split('-').join(' ')).join(', '))
+                                        .concat(['), '])
+                                    }
+                                    </p>
+                                    <label>Damage</label>
                                     {Object.values(damageRolls)?.map((damageRoll, index) => 
-                                        <div key={index}><label>Damage</label>{`${damageRoll.damage} ${damageRoll.damageType}`}</div>
+                                        <div key={index}>{`${damageRoll.damage}${adjustment === 'weak' ? '-2' : adjustment === 'elite' ? '+2' : ''} ${damageRoll.damageType}`}</div>
                                     )}
+                                    {ptagParse(melee.system.description.value)}
                                 </div>
                             </div>
                     )})}
                 </div>
-                <div className="spell-list">
+                {!!spellcastingEntry.length && <div className="spell-list">
                     {spellcastingEntry.map((spellcast)=> (
-                        `${spellcast.name} DC${spellcast.system.spelldc.dc}`
+                        `${spellcast.name} DC ${spellcast.system.spelldc.dc}`
                         ))
                         .concat(['; '])
                         .concat(spells.map((spell)=> (
                             `${spellNumber(spell.system.level.value)} ${spell.name.toLowerCase()}`)
                         ).join('; ')   
                     )}
-                </div>
-                {items?.map((item) => {
-                    if(item.type === 'action'){
+                </div>}
+                <div className='actions'>
+                    {actionItems?.map((actionItem) => {
                         return (
-                            <li key={item._id}>
-                                <label>{item.name}</label>
-                                {item.system.actions.value !== 'passive' && <div>{actions(item.system.actionType.value, item.system.actions?.value)}</div>}
-                                <div dangerouslySetInnerHTML={{ __html:item.system.description.value}}></div>
-                            </li>
+                            <p key={actionItem._id}>
+                                <label style={{display:'inline-block', marginRight:'10px'}}>{actionItem.name}</label>
+                                {actionItem.system.actions.value !== 'passive' && <div>{actions(actionItem.system.actionType.value, actionItem.system.actions?.value)}</div>}
+                                <div style={{display:'inline-block'}} dangerouslySetInnerHTML={{ __html:actionItem.system.description.value}}></div>
+                            </p>
                         )
 
-                    }
-                })}
+                    })}
+                </div>
             </ul>
         </div>
-      <div className="section notes">
-        <h2>Notes</h2>
+      <div className="notes">
+        <label>Notes</label>
         <p dangerouslySetInnerHTML={{ __html: publicNotes }}></p>
       </div>
     </div>
