@@ -1,0 +1,91 @@
+@font-face {
+  font-family: 'Taroca';
+  src: url('/src/assets/fonts/TarocaRegular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Gin';
+  src: url('/src/assets/fonts/Gin/GinTest-Regular.otf');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Sabon';
+  src: url('/src/assets/fonts/Sabon/Sabon.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+.app-container {
+  --tan: #efece1;
+  --blue: #002564;
+  --red: #5D0000;
+  --gold: #D8C384;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100vw;
+  align-items: center;
+  background-color: var(--tan);
+}
+
+.navbar{
+  font-family: 'Taroca', sans-serif;
+  background-color: var(--red);
+  color: var(--gold);
+  padding: 20px;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 15px;
+  border-bottom: 5px solid var(--gold);
+}
+
+.content {
+  font-family: 'Sabon', sans-serif;
+  flex: 1;
+  padding: 20px;
+  max-width: 700px;
+  h1{
+    font-family: 'Taroca', sans-serif;
+    color: #002564;
+    font-size: 1.5rem;
+  }
+  h2{
+    font-family: 'Taroca', sans-serif;
+    color: #5D0000;
+    font-size: 1rem;
+  }
+  h3{
+    font-family: 'Gin', sans-serif;
+    color: #A76652;
+    font-size: 1rem;
+  }
+  button{
+    font-family: 'Gin', sans-serif;
+    background-color: var(--red);
+    color: var(--tan);
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 1rem;
+    border: 2px solid var(--red);
+    text-align: center;
+  }
+  button:hover{
+    color: var(--red);
+    background-color: var(--tan);
+  }
+}
+
+.footer {
+  font-family: 'Taroca';
+  border-top: 5px solid;
+  background-color: var(--red);
+  color: var(--gold);
+  padding: 20px;
+  text-align: center;
+  bottom: 0;
+  width: 100vw;
+}
