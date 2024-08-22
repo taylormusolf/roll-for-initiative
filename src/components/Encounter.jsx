@@ -6,6 +6,7 @@ import { CombatantLibraryContext } from '../context/CombatantLibraryContext';
 import { generateRandomID } from '../util/random';
 import Combatant from './Combatant';
 import PreCombatSetup from './PreCombatSetup';
+import './Encounter.scss'
 
 const Encounter = () => {
   const { id } = useParams();
@@ -159,8 +160,8 @@ const Encounter = () => {
 
   return (
     <div>
-      <Link to="/">Back to Manager</Link>
-      <h1>{encounter ? encounter.name : 'Loading...'}</h1>
+      <Link to="/"><button>Back to Manager</button></Link>
+      <h1 className='encounter-name'>{encounter ? encounter.name : 'Loading...'}</h1>
       {isPreCombat ? (
         <PreCombatSetup setCombatants={handleDataChange} 
           combatants = {initiativeOrder} 

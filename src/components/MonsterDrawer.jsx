@@ -92,14 +92,14 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
 
 
   return (
-    <div className="monster-drawer">
+    <div className="monster-drawer open">
       <div className='monster-drawer-buttons'>
         <button onClick={closeDrawer}><FaWindowClose /></button>
         {currentView !== 'folders' && <button onClick={handleBackClick}>Back</button>}
         {currentView === 'preview' && selectedName && <button onClick={handleAddMonster}>Add NPC</button>}
       </div>
       {currentView === 'folders' && (
-        <div>
+        <div className='monster-drawer-bestiary'>
           <h3>Select a Bestiary</h3>
           <ul>
             {Object.keys(monsters).map((bestiary) => (
@@ -109,7 +109,7 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
         </div>
       )}
       {currentView === 'files' && (
-        <div>
+        <div className='monster-drawer-names'>
           <h3>Select an NPC</h3>
           <ul>
             {monsters[selectedBestiary].map((name) => (

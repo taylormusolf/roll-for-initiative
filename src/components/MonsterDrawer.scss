@@ -1,47 +1,50 @@
 .monster-drawer {
   position: fixed;
-  right: 0;
+  right: -300px; 
   top: 0;
   min-width: 300px;
   height: 100%;
-  background-color: white;
+  background-color: var(--tan);
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
-  // padding: 20px;
-  padding: 0px 20px 0px 20px;
   z-index: 1000;
   overflow-y: auto;
-  color: black;
+  transition: right 0.3s ease;
+  border-left: 2px solid var(--gold);
 }
 
-.monster-drawer button {
-  display: block;
-  margin-bottom: 10px;
-  background-color: black;
-  color: white;
-}
-
-.monster-drawer ul {
-  list-style: none;
-  padding: 0;
-}
-
-.monster-drawer li {
-  cursor: pointer;
-  // padding: 5px;
-}
-
-.monster-drawer li:hover {
-  background-color: #f0f0f0;
-}
-
-.monster-drawer h3{
-  font-weight: bold;
-  text-decoration: underline;
-  padding-bottom: 5px;
+.monster-drawer.open {
+  right: 0; /* Slide in from the right */
 }
 
 .monster-drawer-buttons{
   display: flex;
+  background-color: var(--red);
+  width: 100%;
+  padding: 5px 20px;
+}
+
+.monster-drawer-bestiary, .monster-drawer-names{
+  padding: 0px 20px 5px;
+  font-family: 'FF Good Pro Cond';
+  font-weight: 500;
+  font-size: 1rem;
+  color: black;
+  h3{
+    font-weight: bold;
+    text-decoration: underline;
+    padding-bottom: 5px;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  li{
+    padding: 2px 0px;
+    cursor: pointer;
+  }
+  li:hover {
+    background-color: #f0f0f0;
+  }
 }
 
   
