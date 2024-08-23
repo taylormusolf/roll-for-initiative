@@ -6,7 +6,7 @@ import MonsterDrawer from './MonsterDrawer';
 import monsters from '../assets/data/monsters.json'
 import './PreCombatSetup.scss'
 
-const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatant, removeCombatant, dupeCombatant, handleAddtoLibrary, libraryCombatants, handleRemoveFromLibrary }) => {
+const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatant, removeCombatant, dupeCombatant, handleAddtoLibrary, libraryCombatants, handleRemoveFromLibrary, round, currentTurn }) => {
     const { id } = useParams();
     const { updateEncounter} = useContext(EncounterContext);
     const [showMonsterDrawer, setShowMonsterDrawer] = useState(false);
@@ -31,7 +31,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
         const sortedCombatants = [...combatants].sort((a, b) => b.initiative - a.initiative);
         setIsPreCombat(false);
         setCombatants(sortedCombatants);
-        updateEncounter(Number(id), sortedCombatants, false);
+        updateEncounter(Number(id), sortedCombatants, false, round, currentTurn);
     };
     const npcInitiativeRoll = () => {
         const updatedCombatants = combatants.map((combatant)=> (

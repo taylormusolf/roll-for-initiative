@@ -1,3 +1,17 @@
+.encounter-container{
+    font-family: 'Taroca';
+    input[type="text"],
+    textarea {
+        font-family: 'Taroca', sans-serif; /* Change to your desired font family */
+        font-size: 16px; /* Optionally adjust the font size */
+        padding: 10px; /* Optionally adjust padding for better text visibility */
+        border: 1px solid transparent; /* Optionally add a border */
+        background-color: transparent; /* Make background transparent */
+        width: 100%; /* Optionally adjust width */
+        box-sizing: border-box; /* Ensures padding and border are included in width */
+    }
+}
+
 .encounter-name{
     display: flex;
     justify-content: center;

@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import './MonsterStatBlock.scss';
+import a1 from '../assets/images/a1.png';
+import a2 from '../assets/images/a2.png';
+import a3 from '../assets/images/a3.png';
+import af from '../assets/images/af.png';
+import ar from '../assets/images/ar.png';
+
+
 
 //selectedBestiary, selectedName, setStatblock will be used at NPC creation
 //block will be used to look at stats after creation
@@ -45,14 +52,21 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
     return num + 'th';
   }
   function actions(type, num){
-      const action = {
-          1: '◆',
-          2: '◆◆',
-          3: '◆◆◆',
-          'free': '◇',
-          'reaction': '⟳'
+    //   const action = {
+    //       1: '◆',
+    //       2: '◆◆',
+    //       3: '◆◆◆',
+    //       'free': '◇',
+    //       'reaction': '⟳'
   
-      }
+    //   }
+      const action = {
+        1: a1,
+        2: a2,
+        3: a3,
+        'free': af,
+        'reaction': ar
+    }
       
     if(num){
         return action[num]
@@ -309,7 +323,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
                         return(
                             <div key={index}>
                                 <div className='melee-item'>
-                                    <label>Melee{actions(1)}</label>
+                                    <label>Melee <img src={actions(1)} alt="" srcset="" /></label>
                                     <p>
                                         {[melee.name.toLowerCase(), `+${skillAdjustment(melee.system.bonus.value)}`].join(' ')
                                         .concat([' ('])
@@ -341,7 +355,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
                         return (
                             <p key={actionItem._id}>
                                 <label style={{display:'inline-block', marginRight:'10px'}}>{actionItem.name}</label>
-                                {actionItem.system.actions.value !== 'passive' && <div>{actions(actionItem.system.actionType.value, actionItem.system.actions?.value)}</div>}
+                                {actionItem.system.actions.value !== 'passive' && <div><img src={actions(actionItem.system.actionType.value, actionItem.system.actions?.value)} alt="" srcset="" /></div>}
                                 <div style={{display:'inline-block'}} dangerouslySetInnerHTML={{ __html:actionItem.system.description.value}}></div>
                             </p>
                         )

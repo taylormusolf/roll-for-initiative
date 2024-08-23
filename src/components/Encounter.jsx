@@ -25,6 +25,8 @@ const Encounter = () => {
   useEffect(()=> {
     if(combatants){ //update if combatants info is ready from local storage
       setInitiativeOrder(combatants); //this update to initiativeOrder does not cause an update to localStorage
+      setCurrentTurn(encounter.currentTurn);
+      setRound(encounter.round);
       setIsPreCombat(encounter.isPreCombat);
     }
   }, [combatants])
@@ -41,7 +43,7 @@ const Encounter = () => {
   }
   useEffect(()=> {
     if(isModified){ //checks if the update to initiativeOrder is one that we want updated in localStorage
-      updateEncounter(Number(id), initiativeOrder, isPreCombat).then(()=> setIsModified(false));
+      updateEncounter(Number(id), initiativeOrder, isPreCombat, round, currentTurn).then(()=> setIsModified(false));
     }
   }, [initiativeOrder, isModified])
 
@@ -91,11 +93,11 @@ const Encounter = () => {
       }
       return condition;
     });
-    handleDataChange(newOrder);
     setCurrentTurn((currentTurn + 1) % initiativeOrder.length);
     if (currentTurn === initiativeOrder.length - 1) {
       setRound(round + 1);
     }
+    handleDataChange(newOrder);
   };
 
   const prevTurn = () => {
@@ -105,6 +107,7 @@ const Encounter = () => {
     if (currentTurn === 0 && round > 1) {
       setRound(round - 1);
     }
+    handleDataChange(initiativeOrder);
   };
 
   const moveUp = (id) => {
@@ -160,7 +163,7 @@ const Encounter = () => {
   };
 
   return (
-    <div>
+    <div className='encounter-container'>
       <div className='encounter-buttons'>
         <Link to="/"><button>Back to Manager</button></Link>
         <button onClick={endEncounter}>End Encounter</button>
@@ -177,6 +180,8 @@ const Encounter = () => {
           handleAddtoLibrary={handleAddtoLibrary}
           libraryCombatants={libraryCombatants}
           handleRemoveFromLibrary={handleRemoveFromLibrary}
+          round={round}
+          currentTurn={currentTurn}
         />
       ): (
         <div>
@@ -185,7 +190,7 @@ const Encounter = () => {
           <div className='encounter-combat-index'>
             {initiativeOrder.map((combatant, index) => {
               return(
-                <>
+                <div key={index}>
                   {index === currentTurn && 
                   <div className='encounter-next-bar-container'>
                     <div className='encounter-next-bar' onClick={nextTurn}>
@@ -210,7 +215,7 @@ const Encounter = () => {
                     updateConditions={updateConditions}
                     removeCombatant={() => removeCombatant(index)}
                   />
-                </>
+                </div>
 
               ) 
             })}
