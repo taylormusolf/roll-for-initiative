@@ -10,8 +10,13 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
     const { id } = useParams();
     const { updateEncounter} = useContext(EncounterContext);
     const [showMonsterDrawer, setShowMonsterDrawer] = useState(false);
+    const [APL, setAPL] = useState(0);
+    const [CR, setCR] = useState('');
+    const [XP, setXP] = useState(0);
 
-
+    useEffect(()=> {
+        calculateEncounterRating();
+    }, [APL, combatants])
     const updateCombatant = (index, key, value) => {
         const updatedCombatants = combatants.map((combatant, i) =>
         i === index ? { ...combatant, [key]: value } : combatant
@@ -39,8 +44,83 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
         ))
         setCombatants(updatedCombatants);
     }
+    const calculateEncounterRating = ()=> {
+        let pcCount = 0;
+        let xpCount = 0;
+        for(const combatant of combatants){
+            if(combatant.isPC){
+                pcCount++;
+            } else {
+                const {cr} = combatant;
+                console.log(cr)
+                switch (cr) {
+                    case APL - 4:
+                        xpCount += 10;
+                        break;
+                    case APL - 3:
+                        xpCount += 15;
+                        break;
+                    case APL - 2:
+                        xpCount += 20;
+                        break;
+                    case APL - 1:
+                        xpCount += 30;
+                        break;
+                    case APL:
+                        xpCount += 40;
+                        break;
+                    case APL + 1:
+                        xpCount += 60;
+                        break;
+                    case APL + 2:
+                        xpCount += 80;
+                        break;
+                    case APL + 3:
+                        xpCount += 120;
+                        break;
+                    case APL + 4:
+                        xpCount += 160;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        const playerAdj = pcCount - 4;
+        if(xpCount <= 40 + playerAdj*10){
+            setCR('Trivial');
+        } else if(xpCount <= 60 + playerAdj*20){
+            setCR('Low');
+        } else if(xpCount <= 80 + playerAdj*20){
+            setCR('Moderate');
+        } else if(xpCount <= 120 + playerAdj*30){
+            setCR('Severe');
+        }else { //160 + playerAdj*40
+            setCR('Extreme');
+        }
+        console.log(xpCount)
+        setXP(xpCount);
+        // Boss and Lackeys (120 XP): One creature of party level + 2, four creatures of party level – 4
+        // Boss and Lieutenant (120 XP): One creature of party level + 2, one creature of party level
+        // Elite Enemies (120 XP): Three creatures of party level
+        // Lieutenant and Lackeys (80 XP): One creature of party level, four creatures of party level – 4
+        // Mated Pair (80 XP): Two creatures of party level
+        // Troop (80 XP): One creature of party level, two creatures of party level – 2
+        // Mook Squad (60 XP): Six creatures of party level – 4
+
+    }
     return (
         <div>
+            <label>APL</label>
+            <input type="text" placeholder="APL" 
+                value={APL}
+                onChange={(e) => setAPL(e.target.value)}
+                style={{ marginRight: '10px' }}
+            />
+            <label>CR </label>
+            {CR}
+            <label>XP </label>
+            {XP}
             <h2>Set Up Combatants</h2>
             {combatants.map((combatant, index) => (
                 <div key={index} style={{ marginBottom: '10px' }}>
@@ -51,6 +131,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                     onChange={(e) => updateCombatant(index, 'name', e.target.value)}
                     style={{ marginRight: '10px' }}
                 />
+                {!combatant.isPC && `(CR: ${combatant.cr})`}
                 <label>Initiative: </label>
                 <input
                     type="number"
