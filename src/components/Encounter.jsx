@@ -7,6 +7,7 @@ import { generateRandomID } from '../util/random';
 import Combatant from './Combatant';
 import PreCombatSetup from './PreCombatSetup';
 import './Encounter.scss'
+import { BsChevronDoubleDown } from "react-icons/bs";
 
 const Encounter = () => {
   const { id } = useParams();
@@ -160,8 +161,12 @@ const Encounter = () => {
 
   return (
     <div>
-      <Link to="/"><button>Back to Manager</button></Link>
-      <h1 className='encounter-name'>{encounter ? encounter.name : 'Loading...'}</h1>
+      <div className='encounter-buttons'>
+        <Link to="/"><button>Back to Manager</button></Link>
+        <button onClick={endEncounter}>End Encounter</button>
+        {/* <button onClick={addCombatant}>Add Combatant</button> */}
+      </div>
+        <h1 className='encounter-name'>{encounter ? encounter.name : 'Loading...'}</h1>
       {isPreCombat ? (
         <PreCombatSetup setCombatants={handleDataChange} 
           combatants = {initiativeOrder} 
@@ -176,23 +181,40 @@ const Encounter = () => {
       ): (
         <div>
           <h2>Round: {round}</h2>
-          <button onClick={prevTurn}>Previous</button>
-          <button onClick={nextTurn}>Next</button>
-          {initiativeOrder.map((combatant, index) => {
-            return <Combatant
-              key={combatant.id}
-              {...combatant}
-              isCurrent={index === currentTurn}
-              moveUp={moveUp}
-              moveDown={moveDown}
-              updateHealth={updateHealth}
-              updateName={updateName}
-              updateConditions={updateConditions}
-              removeCombatant={() => removeCombatant(index)}
-            />
-})}
-          <button onClick={addCombatant}>Add Combatant</button>
-          <button onClick={endEncounter}>End Encounter</button>
+          
+          <div className='encounter-combat-index'>
+            {initiativeOrder.map((combatant, index) => {
+              return(
+                <>
+                  {index === currentTurn && 
+                  <div className='encounter-next-bar-container'>
+                    <div className='encounter-next-bar' onClick={nextTurn}>
+                        <div className='encounter-next-bar-icon'><BsChevronDoubleDown /></div>
+                        <div className='encounter-next-bar-text-container'>
+                          <div>CURRENT COMBATANT</div>
+                          <div>TAP TO ADVANCE</div>
+                        </div>
+                    </div>
+                    <div className='encounter-previous' onClick={prevTurn}>
+                      <div>Previous</div>
+                    </div>
+                  </div>}
+                  <Combatant
+                    key={combatant.id}
+                    {...combatant}
+                    isCurrent={index === currentTurn}
+                    moveUp={moveUp}
+                    moveDown={moveDown}
+                    updateHealth={updateHealth}
+                    updateName={updateName}
+                    updateConditions={updateConditions}
+                    removeCombatant={() => removeCombatant(index)}
+                  />
+                </>
+
+              ) 
+            })}
+          </div>
         </div>
 
       )}

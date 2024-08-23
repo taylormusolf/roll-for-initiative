@@ -16,14 +16,10 @@
     }
   }
   
-  .header {
+  .monster-name-line {
     display: flex;
     justify-content: space-between;
     border-bottom: 1px solid;
-    h1 {
-      font-size: 1rem;
-      font-weight: 700;
-    }
   }
   .misc-stats, .defense{
     border-bottom: 1px solid;

@@ -3,3 +3,54 @@
     justify-content: center;
     width: 100%;
 }
+.encounter-buttons{
+    display: flex;
+    justify-content: space-between;
+}
+.encounter-combat-index{
+    background-color: var(--red);
+    border: solid 3px var(--gold);
+}
+
+.encounter-next-bar-container{
+    display: flex;
+    font-family: 'Taroca';
+    color: var(--gold);
+    justify-content: space-between;
+    align-items: center;
+    margin: 0px 20px;
+}
+.encounter-next-bar{
+    cursor: pointer;
+    flex: 3;
+    display: flex;
+    gap: 20px;
+}
+.encounter-next-bar:hover{
+    color: var(--tan);
+}
+
+.encounter-previous{
+    cursor: pointer;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 62px;
+}
+
+.encounter-previous:hover{
+    color: var(--tan);
+}
+
+
+.encounter-next-bar-icon{
+    font-size: 50px;
+}
+
+.encounter-next-bar-text-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}

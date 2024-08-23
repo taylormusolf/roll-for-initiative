@@ -19,7 +19,7 @@
 
 @import './assets/fonts/ff-good-pro-condensed/stylesheet.css';
 
-#root{
+#root, .ReactModal__Overlay, .ReactModal__Content{
   --tan: #efece1;
   --blue: #002564;
   --red: #5D0000;

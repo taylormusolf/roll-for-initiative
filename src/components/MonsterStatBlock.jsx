@@ -169,7 +169,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
                 <option value="standard">Standard</option>
             </select>
         </div>
-        <div className="header">
+        <div className="monster-name-line">
             <h1>{(adjustment === 'weak' ? 'WEAK ': adjustment === 'elite' ? 'ELITE ' : '') + name.toUpperCase()}</h1>
             <h1>CREATURE {levelAdjustment(level.value)}</h1>
         </div>
