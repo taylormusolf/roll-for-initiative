@@ -35,8 +35,8 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
       abilities,
       attributes: { ac, hp, immunities, resistances, speed, allSaves, weaknesses, hardness },
       details: { languages, level, publicNotes },
-      initiative: {statistic},
-      perception: {details, mod, senses},
+      initiative,
+      perception,
       resources: {focus},
       saves: {fortitude, reflex, will},
       skills,
@@ -106,7 +106,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
         'rare': 20,
         'unique': 25
     }
-    return <p><label>Recall Knowledge</label>{`${matchingTypes.join(', ')} (${knowledgeTypes.join(', ')}): DC ${rarity[mRarity]}, unspecific lore: DC ${rarity[mRarity] - 2}, specific lore: DC ${rarity[mRarity] - 5}`} </p>
+    return <p className='knowledge'><label>Recall Knowledge</label>{`${matchingTypes.join(', ')} (${knowledgeTypes.join(', ')}): DC ${rarity[mRarity]}, unspecific lore: DC ${rarity[mRarity] - 2}, specific lore: DC ${rarity[mRarity] - 5}`} </p>
   }
   const levelAdjustment = (level)=> {
     if(adjustment === 'standard'){
@@ -175,7 +175,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
 
   return (
     <div className="monster-stat-block">
-        <div>
+        <div className='adjustment-container'>
             <label htmlFor="options">Adjustment:</label>
             <select id="options" value={adjustment} onChange={handleSelectAdjustment}>
                 <option value="elite">Elite</option>
@@ -196,18 +196,18 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
                     return <div className='traits-misc' key={t} >{t.toUpperCase()}</div>
                 })}
             </div>
-            <div className="perception">
+            {!!perception && <div className="perception">
                 <label>Perception</label>
-                <div>{`+${skillAdjustment(mod)}; `}</div>
-                <div style={{paddingLeft: '5px'}}>
-                    {details ? 
-                        senses?.map(sense => sense.type).concat(details).join(', ')
+                <div>{`+${skillAdjustment(perception?.mod)};`}</div>
+                <div>
+                    {perception?.details ? 
+                        perception?.senses?.map(sense => sense.type).concat(perception?.details).join(', ')
                         :
-                        senses?.map(sense => sense.type).join(', ')
+                        perception?.senses?.map(sense => sense.type).join(', ')
                     }
                 </div>
                 
-            </div>
+            </div>}
             <div className="perception">{knowledgeCheck(value, rarity)}</div>
             {!!languages?.value.length && <div className="languages">
                 <label>Languages</label>
@@ -252,26 +252,27 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
             {
              !!weapons?.length &&<div className="items">
                 <label>Items</label>
-                {weapons.map((weapon) => weapon.system.baseItem).join(' ,')}
+                {weapons.map((weapon) => weapon.system.baseItem.split('-').join(' ')).join(', ')}
             </div>
             }
         </div>
         <div className="defense">
             <div className="defense-top-line">
                 <li><label>AC</label>
-                    {!!ac.details.length ?
-                    `${skillAdjustment(ac.value) + ' ' + ac.details};`
-                    :
-                    `${skillAdjustment(ac.value)};`
-                    }
-                    
+                    <div>
+                        {!!ac.details.length ?
+                        `${skillAdjustment(ac.value) + ' ' + ac.details};`
+                        :
+                        `${skillAdjustment(ac.value)};`
+                        }
+                    </div>
                 </li>
                 <li><label>Fort</label>{`+${skillAdjustment(fortitude.value)},`}</li>
                 <li><label>Ref</label>{`+${skillAdjustment(reflex.value)},`}</li> 
                 <li><label>Will</label>{allSaves.value ? `+${skillAdjustment(will.value)};` : `+${skillAdjustment(will.value)}`}</li> 
                 <li>{` ${allSaves.value}`}</li> 
             </div>
-            <div className="defense-top-line">
+            <div className="defense-second-line">
                 <div>
                     {hardness?.value ? 
                         <div><label>HP</label>{`${hpAdjustment(hp.max, level.value)}; `} <label>Hardness:</label>{`${hardness.value}`} </div>
@@ -307,7 +308,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
             </div>}
         </div>
         <div className='offense'>
-            <div><label>Speed</label>{speed.value} feet{!!speed.otherSpeeds.length && ','}</div>
+            <div className='speed'><label>Speed</label>{speed.value} feet{!!speed.otherSpeeds.length && ','}</div>
             <ul className='speeds-list'>
                 {speed.otherSpeeds?.map((speed, index) => (
                     <li key={index}>{`${speed.type} ${speed.value} feet`}</li>
@@ -323,7 +324,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
                         return(
                             <div key={index}>
                                 <div className='melee-item'>
-                                    <label>Melee <img src={actions(1)} alt="" srcset="" /></label>
+                                    <label>Melee <img src={actions(1)} alt="" /></label>
                                     <p>
                                         {[melee.name.toLowerCase(), `+${skillAdjustment(melee.system.bonus.value)}`].join(' ')
                                         .concat([' ('])
@@ -335,7 +336,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
                                     {Object.values(damageRolls)?.map((damageRoll, index) => 
                                         <div key={index}>{`${damageRoll.damage}${adjustment === 'weak' ? '-2' : adjustment === 'elite' ? '+2' : ''} ${damageRoll.damageType}`}</div>
                                     )}
-                                    {ptagParse(melee.system.description.value)}
+                                    {!!melee.system.description.value && ptagParse(melee.system.description.value)}
                                 </div>
                             </div>
                     )})}
@@ -353,11 +354,11 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
                 <div className='actions'>
                     {actionItems?.map((actionItem) => {
                         return (
-                            <p key={actionItem._id}>
-                                <label style={{display:'inline-block', marginRight:'10px'}}>{actionItem.name}</label>
-                                {actionItem.system.actions.value !== 'passive' && <div><img src={actions(actionItem.system.actionType.value, actionItem.system.actions?.value)} alt="" srcset="" /></div>}
-                                <div style={{display:'inline-block'}} dangerouslySetInnerHTML={{ __html:actionItem.system.description.value}}></div>
-                            </p>
+                            <div className='action-item' key={actionItem._id}>
+                                <label>{actionItem.name}</label>
+                                {actionItem.system.actions.value !== 'passive' && <div><img src={actions(actionItem.system.actionType.value, actionItem.system.actions?.value)} alt="" /></div>}
+                                <div dangerouslySetInnerHTML={{ __html:actionItem.system.description.value}}></div>
+                            </div>
                         )
 
                     })}

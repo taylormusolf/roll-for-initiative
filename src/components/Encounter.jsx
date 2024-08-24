@@ -21,7 +21,6 @@ const Encounter = () => {
   const [currentTurn, setCurrentTurn] = useState(0);
   const [isPreCombat, setIsPreCombat] = useState(true);
   const [isModified, setIsModified] = useState(false);
-
   useEffect(()=> {
     if(combatants){ //update if combatants info is ready from local storage
       setInitiativeOrder(combatants); //this update to initiativeOrder does not cause an update to localStorage
@@ -35,6 +34,10 @@ const Encounter = () => {
       setLibraryCombatants(library);
     }
   }, [library])
+
+  useEffect(()=> {
+    window.scrollTo(0, 0)
+  }, [isPreCombat])
   
 
   const handleDataChange = (newData) => { //handler that wraps updates to setInitiative that we want to update in localStorage
@@ -166,7 +169,7 @@ const Encounter = () => {
     <div className='encounter-container'>
       <div className='encounter-buttons'>
         <Link to="/"><button>Back to Manager</button></Link>
-        <button onClick={endEncounter}>End Encounter</button>
+        {!isPreCombat && <button onClick={endEncounter}>End Encounter</button>}
         {/* <button onClick={addCombatant}>Add Combatant</button> */}
       </div>
         <h1 className='encounter-name'>{encounter ? encounter.name : 'Loading...'}</h1>

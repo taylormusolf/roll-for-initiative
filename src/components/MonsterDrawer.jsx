@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import MonsterStatBlock from './MonsterStatBlock';
 import './MonsterDrawer.scss';
 import { generateRandomID } from '../util/random';
@@ -9,7 +9,16 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
   const [selectedBestiary, setSelectedBestiary] = useState(null);
   const [selectedName, setSelectedName] = useState(null);
   const [statblock, setStatblock] = useState(null);
+  const scrollRef = useRef(null);
 
+
+  useEffect(()=> {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        top: 0
+      });
+    }
+  }, [selectedBestiary, selectedName, statblock])
   const handleBestiaryClick = (bestiary) => {
     setSelectedBestiary(bestiary);
     setCurrentView('files');
@@ -92,7 +101,7 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
 
 
   return (
-    <div className="monster-drawer open">
+    <div className="monster-drawer open"  ref={scrollRef}>
       <div className='monster-drawer-buttons'>
         <button onClick={closeDrawer}><FaWindowClose /></button>
         {currentView !== 'folders' && <button onClick={handleBackClick}>Back</button>}

@@ -52,7 +52,6 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                 pcCount++;
             } else {
                 const {cr} = combatant;
-                console.log(cr)
                 switch (cr) {
                     case APL - 4:
                         xpCount += 10;
@@ -98,7 +97,6 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
         }else { //160 + playerAdj*40
             setCR('Extreme');
         }
-        console.log(xpCount)
         setXP(xpCount);
         // Boss and Lackeys (120 XP): One creature of party level + 2, four creatures of party level – 4
         // Boss and Lieutenant (120 XP): One creature of party level + 2, one creature of party level

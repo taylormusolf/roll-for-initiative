@@ -8,7 +8,7 @@
     color: black;
     label {
       font-weight: 700;
-      padding-right: .25rem;
+      // padding-right: .25rem;
     }
     li {
       padding-right: .25rem;
@@ -27,8 +27,13 @@
   .misc-stats, .defense{
     border-bottom: 1px solid;
   }
+
+  .adjustment-container, .perception, .knowledge, .languages, .skills, .abilities-list div, .items, .defense-top-line li, .defense-second-line div, .immunities, .resistances, .weaknesses, .speed{
+    display: flex;
+    gap: 5px;
+  }
   
-  .perception, .languages, .skills, .abilities-list, .traits, .special, .resistances, .defense-top-line, .weaknesses, .offense{
+  .perception, .languages, .skills, .abilities-list, .traits, .special, .resistances, .defense-top-line, .weaknesses, .offense, .defense-second-line{
     display: flex;
     padding-top:5px;
   }
@@ -82,7 +87,7 @@
 .melee-list{
   flex-direction: column;
 }  
-.melee-item{
+.melee-item, .action-item{
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
