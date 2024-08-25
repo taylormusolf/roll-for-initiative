@@ -1,8 +1,4 @@
-.library-index{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+
 
 .precombat-rating-container{
     display: flex;
@@ -65,4 +61,27 @@
         position: relative;
         left: -10px;
     }
+}
+
+.library-container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10px;
+}
+
+.libary-buttons{
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+}
+
+.library-index{
+
+}
+
+.library-index-item{
+    display: flex;
+    // justify-content: center;
+    align-items: center;
 }

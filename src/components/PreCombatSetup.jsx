@@ -219,9 +219,12 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
             </div>
             <div className='precombat-subheader-container'>
                 <h2>Set Up Combatants</h2>
-                <button onClick={handleStart} disabled={combatants.length === 0}>
-                    Start Encounter
-                </button>
+                <div className='precombat-subheader-buttons'>
+                    <button onClick={handleStart} disabled={combatants.length === 0}>
+                        Start Encounter
+                    </button>
+                    <button onClick={npcInitiativeRoll}>Roll Initiative for NPCs</button>
+                </div>
             </div>
             <div>
                 <button onClick={handleRemoveCombatants} style={{ marginLeft: '10px' }}>Remove</button>
@@ -291,19 +294,23 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
             <button onClick={() => addCombatant(false)}>Add NPC</button>
             <button onClick={() => setShowMonsterDrawer(true)}>Add NPC with Statblock</button>
             <button onClick={() => addCombatant(true)}>Add PC</button>
-            <button onClick={npcInitiativeRoll}>Roll Initiative for NPCs</button>
-            <div>
+            
+            <div className='library-container'>
                 <h3>Combatant Library</h3>
-                <button onClick={addCombatantsFromLibrary}>Add to Encounter</button>
-                <button onClick={handleLibraryRemoval}>Remove From Library</button>
-                {libraryCombatants.map((combatant) => (
-                <div key={combatant.id}>
-                    <div className='library-index'> 
-                        <input type='checkbox' value={combatant.id} onChange={handleLibraryCheckboxChange}/>
-                        <p style={{color: combatant.isPC ? 'blue': 'red'}}>{combatant.name}</p>
-                    </div>
+                <div className='libary-buttons'>
+                    <button onClick={addCombatantsFromLibrary}>Add to Encounter</button>
+                    <button onClick={handleLibraryRemoval}>Remove From Library</button>
                 </div>
-                ))}
+                <div className='library-index'>
+                    {libraryCombatants.map((combatant) => (
+                    <div key={combatant.id}>
+                        <div className='library-index-item'> 
+                            <input type='checkbox' value={combatant.id} onChange={handleLibraryCheckboxChange}/>
+                            <p style={{color: combatant.isPC ? 'blue': 'red'}}>{combatant.name}</p>
+                        </div>
+                    </div>
+                    ))}
+                </div>
             </div>
             <div>
             </div>
