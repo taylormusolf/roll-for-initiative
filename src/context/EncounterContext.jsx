@@ -25,13 +25,13 @@ const EncounterProvider = ({ children }) => {
   }, [encounters]);
 
   const addEncounter = (name) => {
-    const newEncounter = { id: Date.now(), name: name || new Date().toLocaleString(), combatants: [], isPreCombat: true, round: 1, currentTurn: 0 };
+    const newEncounter = { id: Date.now(), name: name || new Date().toLocaleString(), combatants: [], isPreCombat: true, round: 1, currentTurn: 0, APL: 0 };
     setEncounters([...encounters, newEncounter]);
   };
 
-  const updateEncounter = async (id, updatedCombatants, isPreCombat, round, currentTurn) => {
+  const updateEncounter = async (id, updatedCombatants, isPreCombat, round, currentTurn, APL) => {
     setEncounters(encounters.map(enc =>
-      enc.id === id ? { ...enc, combatants: updatedCombatants, isPreCombat, round, currentTurn } : enc
+      enc.id === id ? { ...enc, combatants: updatedCombatants, isPreCombat, round, currentTurn, APL } : enc
     ));
   };
 

@@ -21,11 +21,17 @@ const Encounter = () => {
   const [currentTurn, setCurrentTurn] = useState(0);
   const [isPreCombat, setIsPreCombat] = useState(true);
   const [isModified, setIsModified] = useState(false);
+  const [APL, setAPL] = useState(0);
+  const [CR, setCR] = useState('');
+  const [XP, setXP] = useState(0);
+
+  console.log('APL', APL)
   useEffect(()=> {
     if(combatants){ //update if combatants info is ready from local storage
       setInitiativeOrder(combatants); //this update to initiativeOrder does not cause an update to localStorage
       setCurrentTurn(encounter.currentTurn);
       setRound(encounter.round);
+      setAPL(encounter.APL)
       setIsPreCombat(encounter.isPreCombat);
     }
   }, [combatants])
@@ -46,7 +52,7 @@ const Encounter = () => {
   }
   useEffect(()=> {
     if(isModified){ //checks if the update to initiativeOrder is one that we want updated in localStorage
-      updateEncounter(Number(id), initiativeOrder, isPreCombat, round, currentTurn).then(()=> setIsModified(false));
+      updateEncounter(Number(id), initiativeOrder, isPreCombat, round, currentTurn, APL).then(()=> setIsModified(false));
     }
   }, [initiativeOrder, isModified])
 
@@ -162,7 +168,7 @@ const Encounter = () => {
 
   const endEncounter = () => {
     setIsPreCombat(true);
-    updateEncounter(Number(id), initiativeOrder, true);
+    updateEncounter(Number(id), initiativeOrder, true, APL);
   };
 
   return (
@@ -185,6 +191,12 @@ const Encounter = () => {
           handleRemoveFromLibrary={handleRemoveFromLibrary}
           round={round}
           currentTurn={currentTurn}
+          APL={APL}
+          setAPL={setAPL}
+          CR={CR}
+          setCR={setCR}
+          XP={XP}
+          setXP={setXP}
         />
       ): (
         <div>

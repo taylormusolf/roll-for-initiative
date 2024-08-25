@@ -3,3 +3,62 @@
     justify-content: center;
     align-items: center;
 }
+
+.precombat-rating-container{
+    display: flex;
+    justify-content: space-between;
+}
+
+.precombat-rating-apl, .precombat-rating-cr, .precombat-rating-xp{
+    display: flex;
+    // flex: 1;
+    align-items: center;
+}
+
+.precombat-rating-apl input[type=text]{
+    width: 50px !important;
+}
+
+.precombat-rating-cr, .precombat-rating-xp{
+    gap: 5px;
+}
+
+.precombat-warning{
+    color: red;
+    padding-bottom: 5px;
+}
+
+.precombat-subheader-container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.precombat-combatant-name{
+    display: flex;
+    flex-direction: column;
+}
+.precombat-combatant-cr{
+    position: relative;
+    top: -10px;
+    left: 15px;
+}
+
+.precombat-combatant{
+    margin-bottom: '10px';
+    display: flex;
+    align-items: center;
+    input[type=text]{
+        width: 200px !important;
+    }
+}
+
+.precombat-combatant-initiative{
+    display: flex;
+    flex-direction: column;
+    label{
+        font-size: .75rem;
+        position: relative;
+        left: -10px;
+    }
+}
