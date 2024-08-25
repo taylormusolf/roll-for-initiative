@@ -26,12 +26,21 @@ const CombatantLibraryProvider = ({ children }) => {
     setLibrary([...library, combatant]);
   };
 
+  const addCombatantsToLibrary = (combatants) => {
+    setLibrary([...library, ...combatants]);
+  };
+
   const removeCombatantFromLibrary = (index) => {
     setLibrary(library.filter((_, i) => i !== index));
   };
 
+  const removeCombatantsFromLibrary = (ids) => {
+    console.log(ids, library)
+    setLibrary(library.filter((item) => !ids.includes(item.id)));
+  };
+
   return (
-    <CombatantLibraryContext.Provider value={{ library, addCombatantToLibrary, removeCombatantFromLibrary }}>
+    <CombatantLibraryContext.Provider value={{ library, addCombatantToLibrary, addCombatantsToLibrary, removeCombatantFromLibrary, removeCombatantsFromLibrary }}>
       {children}
     </CombatantLibraryContext.Provider>
   );

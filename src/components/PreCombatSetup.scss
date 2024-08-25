@@ -38,6 +38,10 @@
     display: flex;
     flex-direction: column;
 }
+.precombat-combatant-name-inner{
+    display: flex;
+    align-items: center;
+}
 .precombat-combatant-cr{
     position: relative;
     top: -10px;

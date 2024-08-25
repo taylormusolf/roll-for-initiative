@@ -5,6 +5,7 @@ import { useParams } from 'react-router-dom';
 import { EncounterContext } from '../context/EncounterContext';
 import MonsterDrawer from './MonsterDrawer';
 import monsters from '../assets/data/monsters.json'
+import { generateRandomID } from '../util/random';
 import './PreCombatSetup.scss'
 
 Modal.setAppElement('#root');
@@ -27,13 +28,16 @@ const combatantMenuStyles = {
     },
   };
 
-const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatant, removeCombatant, dupeCombatant, handleAddtoLibrary, libraryCombatants, handleRemoveFromLibrary, round, currentTurn, APL, setAPL, CR, setCR, XP, setXP }) => {
+const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatant, updateCombatants, dupeCombatants, handleAddtoLibrary, libraryCombatants, handleRemoveFromLibrary, round, currentTurn, APL, setAPL, CR, setCR, XP, setXP }) => {
     const { id } = useParams();
     const { updateEncounter} = useContext(EncounterContext);
     const [showMonsterDrawer, setShowMonsterDrawer] = useState(false);
     const [showCombatantMenu, setShowCombatantMenu] = useState(false);
     const [selectedCombatant, setSelectedCombatant] = useState({});
     const [selectedIndex, setSelectedIndex] = useState(null);
+
+    const [selectedCombatantIds, setSelectedCombatantIds] = useState([]);
+    const [selectedLibraryIds, setSelectedLibraryIds] = useState([]);
 
    
     const [warning, setWarning] = useState(false);
@@ -48,8 +52,9 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
         setCombatants(updatedCombatants);
     };
     
-    const addCombatantFromLibrary = (combatant) => {
-        setCombatants([...combatants, combatant]);
+    const addCombatantsFromLibrary = () => {
+        const combatantsToAdd = libraryCombatants.filter(combatant => selectedLibraryIds.includes(combatant.id)).map((comb) => {return {...comb, id: generateRandomID()}});
+        setCombatants([...combatants, ...combatantsToAdd]);
     };
     const addMonster = (monster) => {
         setCombatants([...combatants, monster]);
@@ -69,6 +74,26 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
     const handleAPLSave = () => {
         updateEncounter(Number(id), combatants, true, round, currentTurn, APL)
     }
+    const handleCombatantCheckboxChange = e => {
+        const {value, checked} = e.target;
+
+        if(checked){
+            setSelectedCombatantIds((prev) => [...prev, parseInt(value)]);
+        } else {
+            setSelectedCombatantIds((prev) => prev.filter((item) => item !== parseInt(value)));
+        }
+    }
+
+    const handleLibraryCheckboxChange = e => {
+        const {value, checked} = e.target;
+
+        if(checked){
+            setSelectedLibraryIds((prev) => [...prev, parseInt(value)]);
+        } else {
+            setSelectedLibraryIds((prev) => prev.filter((item) => item !== parseInt(value)));
+        }
+    }
+
     const npcInitiativeRoll = () => {
         const updatedCombatants = combatants.map((combatant)=> (
             !combatant.isPC ? { ...combatant, 'initiative': generateRandomNumber(20, combatant.perception || 0) } : combatant
@@ -148,6 +173,25 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
         // Mook Squad (60 XP): Six creatures of party level – 4
 
     }
+    const handleRemoveCombatants = () => {
+        const updatedCombatants = combatants.filter(combatant => !selectedCombatantIds.includes(combatant.id));
+        updateCombatants(updatedCombatants);
+        setSelectedCombatantIds([]);
+    }
+    const handleMultipleAddToLibrary = () => {
+        const combatantsToAdd = combatants.filter(combatant => selectedCombatantIds.includes(combatant.id));
+        handleAddtoLibrary(combatantsToAdd);
+    }
+    const handleDupeCombatants = () => {
+        const combatantsToDupe = combatants.filter(combatant => selectedCombatantIds.includes(combatant.id));
+        dupeCombatants(combatantsToDupe);
+    }
+
+    const handleLibraryRemoval = () => {
+        handleRemoveFromLibrary(selectedLibraryIds)
+        setSelectedLibraryIds([]);
+    }
+
     return (
         <div className='precombat-container'>
             <div className='precombat-header-container'>
@@ -179,17 +223,24 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                     Start Encounter
                 </button>
             </div>
-
+            <div>
+                <button onClick={handleRemoveCombatants} style={{ marginLeft: '10px' }}>Remove</button>
+                <button onClick={handleDupeCombatants} style={{ marginLeft: '10px' }}>Duplicate</button>
+                <button onClick={handleMultipleAddToLibrary} style={{ marginLeft: '10px' }}>Add to Library</button>
+            </div>
             {combatants.map((combatant, index) => (
-                <div key={index} className='precombat-combatant'>
+                <div key={combatant.id} className='precombat-combatant'>
                     <div className='precombat-combatant-name'>
-                        <input
-                            type="text"
-                            placeholder="Name"
-                            value={combatant.name}
-                            onChange={(e) => updateCombatant(index, 'name', e.target.value)}
-                            style={{ marginRight: '10px', color: combatant.isPC ? 'blue' : 'red'  }}
-                        />
+                        <div className='precombat-combatant-name-inner'>
+                            <input type='checkbox' value={combatant.id} onChange={handleCombatantCheckboxChange}/>
+                            <input
+                                type="text"
+                                placeholder="Name"
+                                value={combatant.name}
+                                onChange={(e) => updateCombatant(index, 'name', e.target.value)}
+                                style={{ marginRight: '10px', color: combatant.isPC ? 'blue' : 'red'  }}
+                            />
+                        </div>
                         <div className='precombat-combatant-cr'>{!combatant.isPC && !!combatant.cr &&`(CR: ${combatant.cr})`}</div>
                         
                     </div>
@@ -232,9 +283,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                             </>
                         )}
                         {/* <button onClick={() => updateCombatant(selectedIndex, 'useHealth', !combatant.useHealth)}>Toggle Health</button> */}
-                        <button onClick={() => removeCombatant(selectedIndex)} style={{ marginLeft: '10px' }}>Remove</button>
-                        <button onClick={() => dupeCombatant(selectedIndex)} style={{ marginLeft: '10px' }}>Duplicate</button>
-                        <button onClick={() => handleAddtoLibrary(selectedIndex)} style={{ marginLeft: '10px' }}>Add to Library</button>
+                        
                     </Modal>
 
                 </div>
@@ -245,12 +294,13 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
             <button onClick={npcInitiativeRoll}>Roll Initiative for NPCs</button>
             <div>
                 <h3>Combatant Library</h3>
-                {libraryCombatants.map((combatant, index) => (
-                <div key={index}>
+                <button onClick={addCombatantsFromLibrary}>Add to Encounter</button>
+                <button onClick={handleLibraryRemoval}>Remove From Library</button>
+                {libraryCombatants.map((combatant) => (
+                <div key={combatant.id}>
                     <div className='library-index'> 
+                        <input type='checkbox' value={combatant.id} onChange={handleLibraryCheckboxChange}/>
                         <p style={{color: combatant.isPC ? 'blue': 'red'}}>{combatant.name}</p>
-                        <button onClick={() => addCombatantFromLibrary(combatant)}>Add to Encounter</button>
-                        <button onClick={() => handleRemoveFromLibrary(index)}>Remove From Library</button>
                     </div>
                 </div>
                 ))}

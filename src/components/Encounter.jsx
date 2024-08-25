@@ -12,7 +12,7 @@ import { BsChevronDoubleDown } from "react-icons/bs";
 const Encounter = () => {
   const { id } = useParams();
   const { encounters, updateEncounter} = useContext(EncounterContext);
-  const { library, addCombatantToLibrary, removeCombatantFromLibrary } = useContext(CombatantLibraryContext);
+  const { library, addCombatantsToLibrary, removeCombatantsFromLibrary } = useContext(CombatantLibraryContext);
   const encounter = encounters.find(enc => enc.id === Number(id));
   const combatants = encounter?.combatants;
   const [round, setRound] = useState(1);
@@ -78,18 +78,19 @@ const Encounter = () => {
         conditions: [] 
       }])
   };
-  const dupeCombatant = (index) => {
-    const newCombatant = {...initiativeOrder[index], id: generateRandomID()};
-    handleDataChange([...initiativeOrder, newCombatant]);
-    setPlayerNum(playerNum + 1);
+  const dupeCombatants = (combatants) => {
+    const newCombatants = combatants.map((combatant)=> {
+      return {...combatant, id: generateRandomID()}
+    })
+    handleDataChange([...initiativeOrder, ...newCombatants]);
+    // setPlayerNum(playerNum + 1);
   };
-  const handleAddtoLibrary = (index) => {
-    // const newCombatant = {...initiativeOrder[index], id: generateRandomID()};
-    addCombatantToLibrary(initiativeOrder[index]);
+  const handleAddtoLibrary = (combatants) => {
+    addCombatantsToLibrary(combatants.map(combatant =>{ return {...combatant, id: generateRandomID(), initiative: ''}}));
   };
-  const handleRemoveFromLibrary = (index) => {
-    setLibraryCombatants(libraryCombatants.filter((_, i) => i !== index));
-    removeCombatantFromLibrary(index)
+  const handleRemoveFromLibrary = (ids) => {
+    setLibraryCombatants(libraryCombatants.filter((item) => !ids.includes(item.id)));
+    removeCombatantsFromLibrary(ids)
   }
 
   const nextTurn = () => {
@@ -165,6 +166,10 @@ const Encounter = () => {
     }
   };
 
+  const updateCombatants = (updatedCombatants) => {
+    handleDataChange(updatedCombatants);
+  };
+
   const endEncounter = () => {
     setIsPreCombat(true);
     updateEncounter(Number(id), initiativeOrder, true, APL);
@@ -183,8 +188,8 @@ const Encounter = () => {
           combatants = {initiativeOrder} 
           setIsPreCombat ={setIsPreCombat} 
           addCombatant={addCombatant} 
-          removeCombatant={removeCombatant} 
-          dupeCombatant={dupeCombatant}
+          updateCombatants={updateCombatants} 
+          dupeCombatants={dupeCombatants}
           handleAddtoLibrary={handleAddtoLibrary}
           libraryCombatants={libraryCombatants}
           handleRemoveFromLibrary={handleRemoveFromLibrary}
