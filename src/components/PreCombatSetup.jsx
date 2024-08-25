@@ -32,7 +32,9 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
     const { updateEncounter} = useContext(EncounterContext);
     const [showMonsterDrawer, setShowMonsterDrawer] = useState(false);
     const [showCombatantMenu, setShowCombatantMenu] = useState(false);
-    const [selectedCombatant, setSelectedCombatant] = useState(null);
+    const [selectedCombatant, setSelectedCombatant] = useState({});
+    const [selectedIndex, setSelectedIndex] = useState(null);
+
    
     const [warning, setWarning] = useState(false);
 
@@ -52,8 +54,9 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
     const addMonster = (monster) => {
         setCombatants([...combatants, monster]);
     };
-    const handleCombatantMenu = (combatant) => {
+    const handleCombatantMenu = (combatant, index) => {
         setSelectedCombatant(combatant);
+        setSelectedIndex(index);
         setShowCombatantMenu(true);
     }
 
@@ -150,7 +153,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
             <div className='precombat-header-container'>
                 <div className='precombat-rating-container'>
                     <div className='precombat-rating-apl'>
-                        <label>APL</label>
+                        <label>APL:</label>
                         <input type="text" placeholder="Average Party Lvl" 
                             value={APL}
                             onChange={(e) => setAPL(e.target.value)}
@@ -158,11 +161,11 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                         <button onClick={handleAPLSave}>Save</button>
                     </div>
                     <div className='precombat-rating-cr'>
-                        <label>CR </label>
+                        <label>CR: </label>
                         <div>{CR}</div>
                     </div>
                     <div className='precombat-rating-xp'>
-                        <label>XP </label>
+                        <label>Total XP: </label>
                         <div>{XP}</div>
                     </div>
                 </div>
@@ -185,7 +188,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                             placeholder="Name"
                             value={combatant.name}
                             onChange={(e) => updateCombatant(index, 'name', e.target.value)}
-                            style={{ marginRight: '10px' }}
+                            style={{ marginRight: '10px', color: combatant.isPC ? 'blue' : 'red'  }}
                         />
                         <div className='precombat-combatant-cr'>{!combatant.isPC && !!combatant.cr &&`(CR: ${combatant.cr})`}</div>
                         
@@ -200,37 +203,38 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                             style={{ marginRight: '10px', width: '40px' }}
                         />
                     </div>
-                    <button onClick={()=> handleCombatantMenu(combatant)}>Menu</button>
+                    <button onClick={()=> handleCombatantMenu(combatant, index)}>Menu</button>
                     <Modal
                         isOpen={showCombatantMenu}
                         onRequestClose={() => setShowCombatantMenu(false)}
                         style={combatantMenuStyles}
                         contentLabel="combatant-menu"
                     >
-                        {combatant.useHealth && !combatant.isPC && (
+                        <div>{selectedCombatant?.name}</div>
+                        {selectedCombatant?.useHealth && !selectedCombatant?.isPC && (
                             <>
                                 <label>Starting Health: </label>
                                 <input
                                     type="number"
                                     placeholder="HP"
-                                    value={combatant.hp}
-                                    onChange={(e) => updateCombatant(index, 'hp', Number(e.target.value))}
+                                    value={selectedCombatant.hp}
+                                    onChange={(e) => updateCombatant(selectedIndex, 'hp', Number(e.target.value))}
                                     style={{ marginRight: '10px', width: '80px' }}
                                 />
                                 <label>Max Health: </label>
                                 <input
                                     type="number"
                                     placeholder="Max HP"
-                                    value={combatant.maxHp}
-                                    onChange={(e) => updateCombatant(index, 'maxHp', Number(e.target.value))}
+                                    value={selectedCombatant.maxHp}
+                                    onChange={(e) => updateCombatant(selectedIndex, 'maxHp', Number(e.target.value))}
                                     style={{ marginRight: '10px', width: '80px' }}
                                 />
                             </>
                         )}
-                        {/* <button onClick={() => updateCombatant(index, 'useHealth', !combatant.useHealth)}>Toggle Health</button> */}
-                        <button onClick={() => removeCombatant(index)} style={{ marginLeft: '10px' }}>Remove</button>
-                        <button onClick={() => dupeCombatant(index)} style={{ marginLeft: '10px' }}>Duplicate</button>
-                        <button onClick={() => handleAddtoLibrary(index)} style={{ marginLeft: '10px' }}>Add to Library</button>
+                        {/* <button onClick={() => updateCombatant(selectedIndex, 'useHealth', !combatant.useHealth)}>Toggle Health</button> */}
+                        <button onClick={() => removeCombatant(selectedIndex)} style={{ marginLeft: '10px' }}>Remove</button>
+                        <button onClick={() => dupeCombatant(selectedIndex)} style={{ marginLeft: '10px' }}>Duplicate</button>
+                        <button onClick={() => handleAddtoLibrary(selectedIndex)} style={{ marginLeft: '10px' }}>Add to Library</button>
                     </Modal>
 
                 </div>
@@ -244,7 +248,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                 {libraryCombatants.map((combatant, index) => (
                 <div key={index}>
                     <div className='library-index'> 
-                        <p>{combatant.name}</p>
+                        <p style={{color: combatant.isPC ? 'blue': 'red'}}>{combatant.name}</p>
                         <button onClick={() => addCombatantFromLibrary(combatant)}>Add to Encounter</button>
                         <button onClick={() => handleRemoveFromLibrary(index)}>Remove From Library</button>
                     </div>

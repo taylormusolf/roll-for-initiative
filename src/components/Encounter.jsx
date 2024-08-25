@@ -25,7 +25,6 @@ const Encounter = () => {
   const [CR, setCR] = useState('');
   const [XP, setXP] = useState(0);
 
-  console.log('APL', APL)
   useEffect(()=> {
     if(combatants){ //update if combatants info is ready from local storage
       setInitiativeOrder(combatants); //this update to initiativeOrder does not cause an update to localStorage
