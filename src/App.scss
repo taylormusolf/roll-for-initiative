@@ -53,6 +53,12 @@
     color: var(--red);
     background-color: var(--tan);
   }
+  input[type=text], input[type=number]{
+    font-family: 'Taroca', sans-serif;
+  }
+  textarea{
+    font-family: 'FF Good Pro Cond', sans-serif;
+  }
 }
 
 .logo{

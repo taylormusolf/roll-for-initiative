@@ -19,12 +19,13 @@ const combatantMenuStyles = {
       marginRight: '-50%',
       transform: 'translate(-50%, -50%)',
       padding: '20px',
-      borderRadius: '10px',
+      borderRadius: '5px',
       width: '300px',
-      backgroundColor: 'rgb(51,51,51)',
+      backgroundColor: 'var(--tan)',
+      fontFamily: 'Taroca'
     },
     overlay: {
-      backgroundColor: 'rgba(0, 0, 0, 0.75)',
+      backgroundColor: 'rgba(0, 0, 0, 0.10)',
     },
   };
 
@@ -33,8 +34,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
     const { updateEncounter} = useContext(EncounterContext);
     const [showMonsterDrawer, setShowMonsterDrawer] = useState(false);
     const [showCombatantMenu, setShowCombatantMenu] = useState(false);
-    const [selectedCombatant, setSelectedCombatant] = useState({});
-    const [selectedIndex, setSelectedIndex] = useState(null);
+    const [selectedCombatantMenuIdx, setSelectCombatantMenuIdx] = useState(0);
 
     const [selectedCombatantIds, setSelectedCombatantIds] = useState([]);
     const [selectedLibraryIds, setSelectedLibraryIds] = useState([]);
@@ -59,11 +59,6 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
     const addMonster = (monster) => {
         setCombatants([...combatants, monster]);
     };
-    const handleCombatantMenu = (combatant, index) => {
-        setSelectedCombatant(combatant);
-        setSelectedIndex(index);
-        setShowCombatantMenu(true);
-    }
 
     const handleStart = () => {
         const sortedCombatants = [...combatants].sort((a, b) => b.initiative - a.initiative);
@@ -94,6 +89,11 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
         }
     }
 
+    const handleSelectedCombatantMenuIdx = (index) => {
+        setSelectCombatantMenuIdx(index);
+        setShowCombatantMenu(true);
+    }
+
     const npcInitiativeRoll = () => {
         const updatedCombatants = combatants.map((combatant)=> (
             !combatant.isPC ? { ...combatant, 'initiative': generateRandomNumber(20, combatant.perception || 0) } : combatant
@@ -109,6 +109,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                 pcCount++;
             } else {
                 const {cr} = combatant;
+                if(!cr) continue;
                 let pAPL = APL ? parseInt(APL) : 0
                 switch (cr) {
                     case pAPL - 4:
@@ -173,6 +174,35 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
         // Mook Squad (60 XP): Six creatures of party level – 4
 
     }
+    const calculateXP = cr => {
+        let pAPL = APL ? parseInt(APL) : 0;
+        switch (cr) {
+            case pAPL - 4:
+                return  10;
+            case pAPL - 3:
+                return  15;
+            case pAPL - 2:
+                return  20;
+            case pAPL - 1:
+                return  30;
+            case pAPL:
+                return  40;
+            case pAPL + 1:
+                return  60;
+            case pAPL + 2:
+                return  80;
+            case pAPL + 3:
+                return  120;
+            case pAPL + 4:
+                return  160;
+            default:
+                if(cr > pAPL + 4){
+                    return  180;
+                } else { //less than APL - 40
+                    return  5;
+                }
+        }
+    }
     const handleRemoveCombatants = () => {
         const updatedCombatants = combatants.filter(combatant => !selectedCombatantIds.includes(combatant.id));
         updateCombatants(updatedCombatants);
@@ -226,74 +256,178 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                     <button onClick={npcInitiativeRoll}>Roll Initiative for NPCs</button>
                 </div>
             </div>
-            <div>
+            <div className='precombat-combatant-add-buttons'>
+                <button onClick={() => addCombatant(false)}>Add NPC</button>
+                <button onClick={() => setShowMonsterDrawer(true)}>Add NPC with Statblock</button>
+                <button onClick={() => addCombatant(true)}>Add PC</button>
+            </div>
+            <div className='precombat-combatant-special-buttons'>
                 <button onClick={handleRemoveCombatants} style={{ marginLeft: '10px' }}>Remove</button>
                 <button onClick={handleDupeCombatants} style={{ marginLeft: '10px' }}>Duplicate</button>
                 <button onClick={handleMultipleAddToLibrary} style={{ marginLeft: '10px' }}>Add to Library</button>
             </div>
-            {combatants.map((combatant, index) => (
-                <div key={combatant.id} className='precombat-combatant'>
-                    <div className='precombat-combatant-name'>
-                        <div className='precombat-combatant-name-inner'>
-                            <input type='checkbox' value={combatant.id} onChange={handleCombatantCheckboxChange}/>
+            <div className='precombat-combatant-container'>
+                {combatants.map((combatant, index) => (
+                    <div key={combatant.id} className='precombat-combatant'>
+                        <div className='precombat-combatant-name'>
+                            <div className='precombat-combatant-name-inner'>
+                                <input type='checkbox' value={combatant.id} onChange={handleCombatantCheckboxChange}/>
+                                <p onClick={()=> handleSelectedCombatantMenuIdx(index)} style={{ marginRight: '10px', color: combatant.isPC ? 'blue' : 'red'  }}>{combatant.name}</p>
+                            </div>
+                            
+                        </div>
+                        <div className='precombat-combatant-initiative'>
+                            <label>Initiative:</label>
                             <input
-                                type="text"
-                                placeholder="Name"
-                                value={combatant.name}
-                                onChange={(e) => updateCombatant(index, 'name', e.target.value)}
-                                style={{ marginRight: '10px', color: combatant.isPC ? 'blue' : 'red'  }}
+                                type="number"
+                                placeholder="???"
+                                value={combatant.initiative}
+                                onChange={(e) => updateCombatant(index, 'initiative', Number(e.target.value))}
+                                style={{ marginRight: '10px', width: '40px' }}
                             />
                         </div>
-                        <div className='precombat-combatant-cr'>{!combatant.isPC && !!combatant.cr &&`(CR: ${combatant.cr})`}</div>
-                        
-                    </div>
-                    <div className='precombat-combatant-initiative'>
-                        <label>Initiative:</label>
-                        <input
-                            type="number"
-                            placeholder="???"
-                            value={combatant.initiative}
-                            onChange={(e) => updateCombatant(index, 'initiative', Number(e.target.value))}
-                            style={{ marginRight: '10px', width: '40px' }}
-                        />
-                    </div>
-                    <button onClick={()=> handleCombatantMenu(combatant, index)}>Menu</button>
-                    <Modal
-                        isOpen={showCombatantMenu}
-                        onRequestClose={() => setShowCombatantMenu(false)}
-                        style={combatantMenuStyles}
-                        contentLabel="combatant-menu"
-                    >
-                        <div>{selectedCombatant?.name}</div>
-                        {selectedCombatant?.useHealth && !selectedCombatant?.isPC && (
-                            <>
-                                <label>Starting Health: </label>
-                                <input
-                                    type="number"
-                                    placeholder="HP"
-                                    value={selectedCombatant.hp}
-                                    onChange={(e) => updateCombatant(selectedIndex, 'hp', Number(e.target.value))}
-                                    style={{ marginRight: '10px', width: '80px' }}
-                                />
-                                <label>Max Health: </label>
-                                <input
-                                    type="number"
-                                    placeholder="Max HP"
-                                    value={selectedCombatant.maxHp}
-                                    onChange={(e) => updateCombatant(selectedIndex, 'maxHp', Number(e.target.value))}
-                                    style={{ marginRight: '10px', width: '80px' }}
-                                />
-                            </>
-                        )}
-                        {/* <button onClick={() => updateCombatant(selectedIndex, 'useHealth', !combatant.useHealth)}>Toggle Health</button> */}
-                        
-                    </Modal>
+                        <div>
+                            {!combatant.isPC && 
+                            <div className='precombat-combatant-stats'>
+                                <div>{combatant.perception && `+${combatant.perception} bonus`}</div>
+                                <div className='precombat-combatant-cr'>{combatant.cr && `CR: ${combatant.cr}`}</div>
+                                <div>{combatant.cr && `XP: ${calculateXP(combatant.cr)}`} </div>
 
-                </div>
-            ))}
-            <button onClick={() => addCombatant(false)}>Add NPC</button>
-            <button onClick={() => setShowMonsterDrawer(true)}>Add NPC with Statblock</button>
-            <button onClick={() => addCombatant(true)}>Add PC</button>
+                            </div>
+                            }
+                        </div>
+                        <Modal
+                            isOpen={showCombatantMenu}
+                            onRequestClose={() => setShowCombatantMenu(false)}
+                            style={combatantMenuStyles}
+                            contentLabel="combatant-menu"
+                        >
+                            <div className='combatant-setup-modal'>
+                                <input
+                                    type="text"
+                                    placeholder="Name"
+                                    value={combatants[selectedCombatantMenuIdx]?.name}
+                                    onChange={(e) => updateCombatant(selectedCombatantMenuIdx, 'name', e.target.value)}
+                                />
+                                <div>
+                                    <label>CR: </label>
+                                    <input
+                                            type="number"
+                                            placeholder="CR"
+                                            value={combatants[selectedCombatantMenuIdx]?.cr}
+                                            onChange={(e) => updateCombatant(selectedCombatantMenuIdx, 'cr', Number(e.target.value))}
+                                    />
+                                </div>
+                                <div>
+                                    <label>Perception: </label>
+                                    <input
+                                            type="number"
+                                            placeholder="Perc"
+                                            value={combatants[selectedCombatantMenuIdx]?.perception}
+                                            onChange={(e) => updateCombatant(selectedCombatantMenuIdx, 'perception', Number(e.target.value))}
+                                    />
+                                </div>
+                                {combatants[selectedCombatantMenuIdx]?.useHealth && !combatants[selectedCombatantMenuIdx]?.isPC && (
+                                    <>
+                                        <div>
+                                            <label>Current HP: </label>
+                                            <input
+                                                type="number"
+                                                placeholder="HP"
+                                                value={combatants[selectedCombatantMenuIdx]?.hp}
+                                                onChange={(e) => updateCombatant(selectedCombatantMenuIdx, 'hp', Number(e.target.value))}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label>Max HP: </label>
+                                            <input
+                                                type="number"
+                                                placeholder="Max HP"
+                                                value={combatants[selectedCombatantMenuIdx]?.maxHp}
+                                                onChange={(e) => updateCombatant(selectedCombatantMenuIdx, 'maxHp', Number(e.target.value))}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label>Temp HP: </label>
+                                            <input
+                                                type="number"
+                                                placeholder="Temp HP"
+                                                value={combatants[selectedCombatantMenuIdx]?.tempHp}
+                                                onChange={(e) => updateCombatant(selectedCombatantMenuIdx, 'tempHp', Number(e.target.value))}
+                                            />
+                                        </div>
+                                    </>
+                                )}
+                                {/* <button onClick={() => updateCombatant(index, 'useHealth', !combatant.useHealth)}>Toggle Health</button> */}
+                                {console.log(combatant)}
+                                <div>
+                                    <div>
+                                      <label>AC: </label>
+                                      <input
+                                                type="number"
+                                                placeholder="AC"
+                                                value={combatants[selectedCombatantMenuIdx]?.ac}
+                                                onChange={(e) => updateCombatant(selectedCombatantMenuIdx, 'ac', Number(e.target.value))}
+                                        />
+                                    </div>
+                                    <div>
+                                      <label>Fortitude: </label>
+                                      <input
+                                                type="number"
+                                                placeholder="Fort"
+                                                value={combatants[selectedCombatantMenuIdx]?.fortitude.value}
+                                                onChange={(e) => updateCombatant(selectedCombatantMenuIdx, 'fortitude', {...combatants[selectedCombatantMenuIdx]?.fortitude, value: Number(e.target.value)})}
+                                        />
+                                    </div>
+                                    <div>
+                                      <label>Reflex: </label>
+                                      <input
+                                                type="number"
+                                                placeholder="Ref"
+                                                value={combatants[selectedCombatantMenuIdx]?.reflex.value}
+                                                onChange={(e) => updateCombatant(selectedCombatantMenuIdx, 'reflex', {...combatants[selectedCombatantMenuIdx]?.reflex, value: Number(e.target.value)})}
+                                        />
+                                    </div>
+                                    <div>
+                                      <label>Will: </label>
+                                      <input
+                                                type="number"
+                                                placeholder="Will"
+                                                value={combatants[selectedCombatantMenuIdx]?.will.value}
+                                                onChange={(e) => updateCombatant(selectedCombatantMenuIdx, 'will', {...combatants[selectedCombatantMenuIdx]?.will, value: Number(e.target.value)})}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label>Speed: </label>
+                                        <input
+                                                type="number"
+                                                placeholder="Speed"
+                                                value={combatants[selectedCombatantMenuIdx]?.speed.value}
+                                                onChange={(e) => updateCombatant(selectedCombatantMenuIdx, 'speed', {...combatants[selectedCombatantMenuIdx]?.speed, value: Number(e.target.value)})}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="">Notes:</label>
+                                        <textarea
+                                            type="text"
+                                            placeholder="Add combatant notes here"
+                                            value={combatants[selectedCombatantMenuIdx]?.notes}
+                                            onChange={(e) => updateCombatant(selectedCombatantMenuIdx, 'notes', e.target.value)}
+                                        />
+                                    </div>
+
+                                    
+                                </div>
+                            
+                            
+                            </div>
+                            
+                        </Modal>
+
+                    </div>
+                ))}
+            </div>
+           
             
             <div className='library-container'>
                 <h3>Combatant Library</h3>

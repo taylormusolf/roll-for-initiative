@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { uniqueNamesGenerator, names } from 'unique-names-generator';
+import { uniqueNamesGenerator, names, animals, starWars, adjectives } from 'unique-names-generator';
 import { EncounterContext } from '../context/EncounterContext';
 import { CombatantLibraryContext } from '../context/CombatantLibraryContext';
 import { generateRandomID } from '../util/random';
@@ -58,7 +58,7 @@ const Encounter = () => {
 
 
   const addCombatant = async(isPC) => {
-    const characterName = uniqueNamesGenerator({dictionaries: [names]});
+    const characterName = uniqueNamesGenerator({dictionaries: [adjectives, animals]}).split('_').join(' ');
     handleDataChange([...initiativeOrder, 
       { id: generateRandomID(),
         name: characterName,
