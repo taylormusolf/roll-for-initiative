@@ -277,7 +277,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                             
                         </div>
                         <div className='precombat-combatant-initiative'>
-                            <label>Initiative:</label>
+                            <label>Initiative{combatant.perception && `(+${combatant.perception})`}:</label>
                             <input
                                 type="number"
                                 placeholder="???"
@@ -289,9 +289,9 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                         <div>
                             {!combatant.isPC && 
                             <div className='precombat-combatant-stats'>
-                                <div>{combatant.perception && `+${combatant.perception} bonus`}</div>
+                                
                                 <div className='precombat-combatant-cr'>{combatant.cr && `CR: ${combatant.cr}`}</div>
-                                <div>{combatant.cr && `XP: ${calculateXP(combatant.cr)}`} </div>
+                                <div>{combatant.cr && `(XP: ${calculateXP(combatant.cr)})`} </div>
 
                             </div>
                             }
@@ -359,7 +359,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                                     </>
                                 )}
                                 {/* <button onClick={() => updateCombatant(index, 'useHealth', !combatant.useHealth)}>Toggle Health</button> */}
-                                {console.log(combatant)}
+                                {/* {console.log(combatant)} */}
                                 <div>
                                     <div>
                                       <label>AC: </label>

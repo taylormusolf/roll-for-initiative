@@ -48,3 +48,44 @@
     width: 20px;
     border-radius: 50%;
   }
+
+  .e-combatant-container{
+    height: 100%;
+  }
+
+  .e-combatant-sections-container{
+    height: 100%;
+  }
+
+  .e-combatant-title-conditions{
+    // background-color: blue;
+    height: 100%;
+    flex: 1;
+  }
+
+  .e-combatant-conditions{
+    height: 100%;
+    flex: 1;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+
+  .conditions-index, .conditions-container{
+    font-family: 'Taroca', sans-serif;
+  }
+
+  .conditions-index {
+    input[type=number]{
+      width: 30px;
+      border: 1px solid black;
+    }
+  }
+
+  .conditions-tooltip {
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+    padding: 5px;
+    border-radius: 3px;
+    z-index: 1000;
+  }

@@ -96,12 +96,12 @@ const Encounter = () => {
   const nextTurn = () => {
     const newOrder = [...initiativeOrder];
     const currentCombatant = newOrder[currentTurn];
-    currentCombatant.conditions = currentCombatant.conditions.map(condition => {
-      if (condition.name === 'Frightened' && condition.value > 0) {
-        return { ...condition, value: condition.value - 1 };
-      }
-      return condition;
-    });
+    // currentCombatant.conditions = currentCombatant.conditions.map(condition => {
+    //   if (condition.name === 'Frightened' && condition.value > 0) {
+    //     return { ...condition, value: condition.value - 1 };
+    //   }
+    //   return condition;
+    // });
     setCurrentTurn((currentTurn + 1) % initiativeOrder.length);
     if (currentTurn === initiativeOrder.length - 1) {
       setRound(round + 1);
@@ -152,6 +152,7 @@ const Encounter = () => {
   };
 
   const updateConditions = (id, conditions) => {
+    console.log(conditions)
     const newOrder = initiativeOrder.map(combatant =>
       combatant.id === id ? { ...combatant, conditions } : combatant
     );
@@ -172,7 +173,7 @@ const Encounter = () => {
 
   const endEncounter = () => {
     setIsPreCombat(true);
-    updateEncounter(Number(id), initiativeOrder, true, APL);
+    updateEncounter(Number(id), initiativeOrder, true, round, currentTurn, APL);
   };
 
   return (
@@ -180,7 +181,7 @@ const Encounter = () => {
       <div className='encounter-buttons'>
         <Link to="/"><button>Back to Manager</button></Link>
         {!isPreCombat && <button onClick={endEncounter}>End Encounter</button>}
-        {/* <button onClick={addCombatant}>Add Combatant</button> */}
+        <button onClick={addCombatant}>Add Combatant</button>
       </div>
         <h1 className='encounter-name'>{encounter ? encounter.name : 'Loading...'}</h1>
       {isPreCombat ? (

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Modal from 'react-modal';
 import { FaArrowUp, FaArrowDown } from "react-icons/fa";
 import { IoCloseSharp } from "react-icons/io5";
@@ -7,6 +7,7 @@ import '../../node_modules/nouislider/dist/nouislider.css';
 import Nouislider from 'nouislider-react';
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import './Combatant.scss'
+import data from '../assets/data/other.json'
 
 
 
@@ -21,9 +22,10 @@ const conditionsMenuStyles = {
     marginRight: '-50%',
     transform: 'translate(-50%, -50%)',
     padding: '20px',
-    borderRadius: '10px',
+    borderRadius: '5px',
     width: '300px',
-    backgroundColor: 'rgb(51,51,51)',
+    backgroundColor: 'var(--tan)',
+    border: '2px solid var(--gold)'
   },
   overlay: {
     backgroundColor: 'rgba(0, 0, 0, 0.75)',
@@ -135,6 +137,14 @@ const Combatant = ({
   const [statBlockModalIsOpen, setStatBlockModalIsOpen] = useState(false);
   const [hpModalIsOpen, setHpModalIsOpen] = useState(false);
   const [toggleAdditionalButtonsMenu, setToggleAdditionalButtonsMenu] = useState(false);
+  const [selectedCondition, setSelectedCondition] = useState('custom');
+  const [customCondition, setCustomCondition] = useState('');
+
+  const [tooltipContent, setTooltipContent] = useState('');
+  const [showTooltip, setShowTooltip] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [tooltipSubject, setTooltipSubject] = useState('')
+
 
   // Calculate the width of the health, damage, and healing bars
   const [healthAdjustment, setHealthAdjustment] = useState('');
@@ -146,21 +156,43 @@ const Combatant = ({
 
   const [value, setValue] = useState([20, 80]); // Initial slider values
 
+
+  useEffect(() => {
+    if(showTooltip){
+      setLoading(true);
+      const url = `https://taylormusolf.com/pf2e/packs/conditions/${tooltipSubject}.json`
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          setTooltipContent(data.system.description.value);
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error('Error fetching content for tooltip', err);
+          setTooltipContent('Error fetching');
+          setLoading(false);
+        })
+    }
+
+  }, [showTooltip])
+
+  const tooltipMouseEnter = (condition) => {
+    if(data.conditions.includes(condition)){
+      setTooltipSubject(condition);
+      setShowTooltip(true);
+    }
+  }
+  const toolTipMouseExit = () => {
+    setTooltipSubject('');
+    setShowTooltip(false);
+  }
+
   const handleChange = (render, handle, value) => {
     console.log('change')
     setValue(value); // Update state on slider change
   };
 
 
-  const toggleCondition = (conditionName) => {
-    const existingCondition = conditions.find((condition) => condition.name === conditionName);
-    if (existingCondition) {
-      updateConditions(id, conditions.filter((condition) => condition.name !== conditionName));
-    } else {
-      const conditionsWithValues = ['Clumsy', 'Doomed', 'Drained', 'Dying', 'Frightened','Enfeebled', 'Persistant Damage', 'Slowed', 'Stunned','Wounded,']
-      updateConditions(id, [...conditions, { name: conditionName, value: conditionsWithValues.includes(conditionName) ? 1 : null }]);
-    }
-  };
 
   const handleConditionChange = (conditionName, value) => {
     const updatedConditions = conditions.map((condition) =>
@@ -168,6 +200,21 @@ const Combatant = ({
     );
     updateConditions(id, updatedConditions);
   };
+  const addCondition = () => {
+    const conditionsWithValues = ['clumsy', 'doomed', 'drained', 'dying', 'frightened','enfeebled', 'persistant-damage', 'slowed', 'stunned','wounded,'];
+    if(selectedCondition === 'custom'){
+      updateConditions(id, [...conditions, { name: customCondition, value: 0 }])
+    }else {
+      updateConditions(id, [...conditions, { name: selectedCondition, value: conditionsWithValues.includes(selectedCondition) ? 1 : null }])
+    }
+  }
+  const removeCondition = (conditionName) => {
+    updateConditions(id, conditions.filter((condition) => condition.name !== conditionName));
+  }
+
+  const handleConditionOptions = (e) => {
+    setSelectedCondition(e.target.value);
+  }
 
   const adjustHealth = () => {
     const adjustment = parseInt(healthAdjustment, 10);
@@ -179,18 +226,20 @@ const Combatant = ({
   };
   const styleToUse = isPC ? pcStyle : npcStyle;
   return (
-    <div style={{ ...styleToUse}}>
-      <div style={{display:'flex', alignItems:'center', justifyContent: 'space-between', width: '100%'}}>
-        <div style={{display:'flex', alignItems:'center'}}>
-          <p style={{ marginRight: '10px' }}>{initiative}</p>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => updateName(id, e.target.value)}
-            style={{ fontWeight: isCurrent ? 'bold' : 'normal', marginRight: '10px', width: '200px' }}
-          />
+    <div className='e-combatant-container' style={{ ...styleToUse}}>
+      <div className='e-combatant-sections-container'style={{display:'flex', alignItems:'center', justifyContent: 'space-between', width: '100%'}}>
+        <div className='e-combatant-title-conditions' style={{display:'flex', alignItems:'center'}}>
+          <div className='e-combatant-title' style={{display:'flex', alignItems:'center'}}>
+            <p style={{ marginRight: '10px' }}>{initiative}</p>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => updateName(id, e.target.value)}
+              style={{ fontWeight: isCurrent ? 'bold' : 'normal', marginRight: '10px', width: '200px' }}
+            />
+          </div>
           {!isPC && useHealth &&(
-            <>
+            <div className='e-combatant-health'>
               <div style={{cursor:'pointer'}} onClick={() => setHpModalIsOpen(!hpModalIsOpen)}>
                 <p style={{ marginRight: '10px' }}>
                   HP: {hp}/{maxHp}
@@ -227,86 +276,54 @@ const Combatant = ({
                       start={value}
                       connect
                       onSlide={handleChange}
-                    />
+                      />
                     <p>Selected Range: {value.join(' - ')}</p>
                   </div>
                 </div>
               </Modal>
-            </>
+            </div>
           )}
-          <div style={{ marginRight: '10px' }}>
+          <div className='e-combatant-conditions' onClick={()=> setConditionsModalIsOpen(true)}>
             <strong>Conditions:</strong>
-            {conditions.map((condition) => (
-              <span key={condition.name} style={{ marginLeft: '5px' }}>
+            {conditions.map((condition, i) => (
+              <span key={`${condition.name}-${i}`} onMouseEnter={() => tooltipMouseEnter(condition.name)} onMouseLeave={toolTipMouseExit} style={{cursor: 'pointer' }}>
                 {condition.name}
                 {condition.value !== null ? ` (${condition.value})` : ''}
+                {showTooltip && (
+                  <div className="conditions-tooltip">
+                    {loading ? 'Loading...' : tooltipContent}
+                  </div>
+                )}
               </span>
             ))}
           </div>
         </div>
         <button onClick={()=> setToggleAdditionalButtonsMenu(!toggleAdditionalButtonsMenu)}>{toggleAdditionalButtonsMenu ? <FaChevronUp /> : <FaChevronDown />}</button>
       </div>
-      {toggleAdditionalButtonsMenu && (<div>
-        <button onClick={() => setConditionsModalIsOpen(true)} style={{ marginRight: '10px' }}>
-          Conditions
-        </button>
         <Modal
           isOpen={conditionsModalIsOpen}
           onRequestClose={() => setConditionsModalIsOpen(false)}
           style={conditionsMenuStyles}
           contentLabel="Conditions"
         >
-          <h2>Conditions</h2>
-          <button onClick={() => toggleCondition('Blinded')}>Blinded</button>
-          {/* <button onClick={() => toggleCondition('Broken')}>Broken</button> */}
-          <button onClick={() => toggleCondition('Clumsy')}>Clumsy</button>
-          {/* <button onClick={() => toggleCondition('Concealed')}>Concealed</button> */}
-          <button onClick={() => toggleCondition('Confused')}>Confused</button>
-          {/* <button onClick={() => toggleCondition('Controlled')}>ontrolled</button> */}
-          <button onClick={() => toggleCondition('Dazzled')}>Dazzled</button>
-          <button onClick={() => toggleCondition('Deafened')}>Deafened</button>
-          <button onClick={() => toggleCondition('Delayed')}>Delayed</button>
-          <button onClick={() => toggleCondition('Doomed')}>Doomed</button>
-          <button onClick={() => toggleCondition('Drained')}>Drained</button>
-          <button onClick={() => toggleCondition('Dying')}>Dying</button>
-          {/* <button onClick={() => toggleCondition('Encumbered')}>Encumbered</button> */}
-          <button onClick={() => toggleCondition('Enfeebled')}>Enfeebled</button>
-          <button onClick={() => toggleCondition('Fascinated')}>Fascinated</button>
-          <button onClick={() => toggleCondition('Fatigued')}>Fatigued</button>
-          <button onClick={() => toggleCondition('Fleeing')}>Fleeing</button>
-          {/* <button onClick={() => toggleCondition('Friendly')}>Friendly</button> */}
-          <button onClick={() => toggleCondition('Frightened')}>Frightened</button>
-          <button onClick={() => toggleCondition('Grabbed')}>Grabbed</button>
-          {/* <button onClick={() => toggleCondition('Helpful')}>Helpful</button> */}
-          {/* <button onClick={() => toggleCondition('Hidden')}>Hidden</button> */}
-          {/* <button onClick={() => toggleCondition('Hostile')}>Hostile</button> */}
-          <button onClick={() => toggleCondition('Immobilized')}>Immobilized</button>
-          <button onClick={() => toggleCondition('Indifferent')}>Indifferent</button>
-          <button onClick={() => toggleCondition('Invisible')}>Invisible</button>
-          {/* <button onClick={() => toggleCondition('Observed')}>Observed</button> */}
-          <button onClick={() => toggleCondition('Off-Guard')}>Off-Guard</button>
-          <button onClick={() => toggleCondition('Paralyzed')}>Paralyzed</button>
-          <button onClick={() => toggleCondition('Persistent Damage')}>Persistent Damage</button>
-          <button onClick={() => toggleCondition('Petrified')}>Petrified</button>
-          <button onClick={() => toggleCondition('Prone')}>Prone</button>
-          <button onClick={() => toggleCondition('Quickened')}>Quickened</button>
-          <button onClick={() => toggleCondition('Restrained')}>Restrained</button>
-          <button onClick={() => toggleCondition('Sickened')}>Sickened</button>
-          <button onClick={() => toggleCondition('Slowed')}>Slowed</button>
-          <button onClick={() => toggleCondition('Stunned')}>Stunned</button>
-          <button onClick={() => toggleCondition('Stupefied')}>Stupefied</button>
-          <button onClick={() => toggleCondition('Unconscious')}>Unconscious</button>
-          {/* <button onClick={() => toggleCondition('Undetected')}>Undetected</button> */}
-          {/* <button onClick={() => toggleCondition('Unfriendly')}>Unfriendly</button> */}
-          {/* <button onClick={() => toggleCondition('Unnoticed')}>Unnoticed</button> */}
-          <button onClick={() => toggleCondition('Wounded')}>Wounded</button>
-          <button onClick={() => toggleCondition('Special 1')}>Special 1</button>
-          <button onClick={() => toggleCondition('Special 2')}>Special 2</button>
-          <button onClick={() => toggleCondition('Special 3')}>Special 3</button>
+          <div className='conditions-container'>
+            <label htmlFor="condition-options">Conditions:</label>
+            <select id="condition-options" value={selectedCondition} onChange={handleConditionOptions}>
+              <option key={`custom`} value='custom'>custom</option>
+              <option key={`delay`} value='delay'>delay</option>
+                {data.conditions.map((condition, i) => (
+                  <option key={`${condition}-${i}`} value={condition}>{condition}</option>
+                ))}
+            </select>
+            {selectedCondition === 'custom' && <input type='text' value={customCondition} placeholder='custom' onChange={e => setCustomCondition(e.target.value)}/>}
+            <button onClick={addCondition}>Add</button>
+          </div>
 
-          {conditions.map((condition) => (
-            <div key={condition.name}>
-              <span>{condition.name}</span>
+          {conditions.map((condition, i) => (
+            <div key={`${condition}-${i}`} className='conditions-index'>
+              <span>
+                      {condition.name}
+              </span>
               {condition.value !== null && (
                 <input
                   type="number"
@@ -314,10 +331,12 @@ const Combatant = ({
                   onChange={(e) => handleConditionChange(condition.name, Number(e.target.value))}
                 />
               )}
+              <button onClick={() => removeCondition(condition.name)}>X</button>
             </div>
           ))}
           <button onClick={() => setConditionsModalIsOpen(false)}>Close</button>
         </Modal>
+        {toggleAdditionalButtonsMenu && (<div>
           <>
             {stats && (<button onClick={() => setStatBlockModalIsOpen(true)}>SB</button>)}
             <button onClick={() => moveUp(id)} style={{ marginRight: '5px' }}>
