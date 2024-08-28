@@ -229,9 +229,6 @@ const Combatant = ({
   };
 
 
-
-
-
   const styleToUse = isPC ? pcStyle : npcStyle;
   return (
     <div className='e-combatant-container' style={{ ...styleToUse}}>
