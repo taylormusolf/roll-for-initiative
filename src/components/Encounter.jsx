@@ -18,6 +18,7 @@ const Encounter = () => {
   const [round, setRound] = useState(1);
   const [initiativeOrder, setInitiativeOrder] =  useState([]);
   const [libraryCombatants, setLibraryCombatants] = useState([]);
+  const [encounterName, setEncounterName] = useState('');
   const [currentTurn, setCurrentTurn] = useState(0);
   const [isPreCombat, setIsPreCombat] = useState(true);
   const [isModified, setIsModified] = useState(false);
@@ -32,6 +33,7 @@ const Encounter = () => {
       setRound(encounter.round);
       setAPL(encounter.APL)
       setIsPreCombat(encounter.isPreCombat);
+      setEncounterName(encounter.name);
     }
   }, [combatants])
   useEffect(()=> {
@@ -49,11 +51,21 @@ const Encounter = () => {
     setInitiativeOrder(newData);
     setIsModified(true);
   }
+  const handleNameChange = (name) => {
+    setEncounterName(name);
+    setIsModified(true);
+  }
   useEffect(()=> {
     if(isModified){ //checks if the update to initiativeOrder is one that we want updated in localStorage
-      updateEncounter(Number(id), initiativeOrder, isPreCombat, round, currentTurn, APL).then(()=> setIsModified(false));
+      updateEncounter({id: Number(id), combatants: initiativeOrder, name: encounterName, round, currentTurn, APL}).then(()=> setIsModified(false));
     }
   }, [initiativeOrder, isModified])
+
+  useEffect(()=> {
+    if(isModified){
+      updateEncounter({id: Number(id), combatants: initiativeOrder, name: encounterName, round, currentTurn, APL}).then(()=> setIsModified(false));
+    }
+  }, [encounterName, isModified])
 
 
 
@@ -144,6 +156,13 @@ const Encounter = () => {
     handleDataChange(newOrder);
   };
 
+  const updateTempHealth = (id, newHealth) => {
+    const newOrder = initiativeOrder.map(combatant =>
+      combatant.id === id ? { ...combatant, tempHp: newHealth } : combatant
+    );
+    handleDataChange(newOrder);
+  };
+
   const updateName = (id, newName) => {
     const newOrder = initiativeOrder.map(combatant =>
       combatant.id === id ? { ...combatant, name: newName } : combatant
@@ -173,17 +192,24 @@ const Encounter = () => {
 
   const endEncounter = () => {
     setIsPreCombat(true);
-    updateEncounter(Number(id), initiativeOrder, true, round, currentTurn, APL);
+    updateEncounter({id: Number(id), combatants: initiativeOrder, isPreCombat: true, round, currentTurn});
   };
 
   return (
     <div className='encounter-container'>
       <div className='encounter-buttons'>
         <Link to="/"><button>Back to Manager</button></Link>
-        {!isPreCombat && <button onClick={endEncounter}>End Encounter</button>}
-        <button onClick={addCombatant}>Add Combatant</button>
+        {!isPreCombat && <button onClick={endEncounter}>Edit Encounter</button>}
+        {/* <button onClick={addCombatant}>Add Combatant</button> */}
       </div>
-        <h1 className='encounter-name'>{encounter ? encounter.name : 'Loading...'}</h1>
+        <div className='encounter-name'>
+          {encounter ? (
+            <input className='encounter-name-input' type="text" value={encounterName} onChange={(e)=>handleNameChange(e.target.value)}/>
+          ):(
+            <h1>{'Loading...'}</h1>
+          )}
+        </div>
+        
       {isPreCombat ? (
         <PreCombatSetup setCombatants={handleDataChange} 
           combatants = {initiativeOrder} 
@@ -231,6 +257,7 @@ const Encounter = () => {
                     moveUp={moveUp}
                     moveDown={moveDown}
                     updateHealth={updateHealth}
+                    updateTempHealth={updateTempHealth}
                     updateName={updateName}
                     updateConditions={updateConditions}
                     removeCombatant={() => removeCombatant(index)}

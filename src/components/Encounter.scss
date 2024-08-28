@@ -15,8 +15,15 @@
 .encounter-name{
     display: flex;
     justify-content: center;
-    width: 100%;
+    
 }
+
+.encounter-name-input{
+    color: #002564;
+    font-size: 1.5rem !important;
+    width: auto !important;
+}
+
 .encounter-buttons{
     display: flex;
     justify-content: space-between;

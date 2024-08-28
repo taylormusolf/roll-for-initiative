@@ -64,10 +64,10 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
         const sortedCombatants = [...combatants].sort((a, b) => b.initiative - a.initiative);
         setIsPreCombat(false);
         setCombatants(sortedCombatants);
-        updateEncounter(Number(id), sortedCombatants, false, round, currentTurn, APL);
+        updateEncounter({id: Number(id), combatants: sortedCombatants, isPreCombat: false});
     };
     const handleAPLSave = () => {
-        updateEncounter(Number(id), combatants, true, round, currentTurn, APL)
+        updateEncounter({id: Number(id), APL})
     }
     const handleCombatantCheckboxChange = e => {
         const {value, checked} = e.target;
@@ -272,7 +272,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                         <div className='precombat-combatant-name'>
                             <div className='precombat-combatant-name-inner'>
                                 <input type='checkbox' value={combatant.id} onChange={handleCombatantCheckboxChange}/>
-                                <p onClick={()=> handleSelectedCombatantMenuIdx(index)} style={{ marginRight: '10px', color: combatant.isPC ? 'blue' : 'red'  }}>{combatant.name}</p>
+                                <p onClick={()=> handleSelectedCombatantMenuIdx(index)} style={{ marginRight: '10px', color: combatant.isPC ? 'var(--blue)' : 'var(--red)'  }}>{combatant.name.length ? combatant.name : 'Nameless'}</p>
                             </div>
                             
                         </div>
@@ -440,7 +440,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                     <div key={combatant.id}>
                         <div className='library-index-item'> 
                             <input type='checkbox' value={combatant.id} onChange={handleLibraryCheckboxChange}/>
-                            <p style={{color: combatant.isPC ? 'blue': 'red'}}>{combatant.name}</p>
+                            <p style={{color: combatant.isPC ? 'var(--blue)': 'var(--red)'}}>{combatant.name}</p>
                         </div>
                     </div>
                     ))}

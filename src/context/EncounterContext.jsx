@@ -29,10 +29,19 @@ const EncounterProvider = ({ children }) => {
     setEncounters([...encounters, newEncounter]);
   };
 
-  const updateEncounter = async (id, updatedCombatants, isPreCombat, round, currentTurn, APL) => {
-    setEncounters(encounters.map(enc =>
-      enc.id === id ? { ...enc, combatants: updatedCombatants, isPreCombat, round, currentTurn, APL } : enc
-    ));
+  const updateEncounter = async ({id, combatants, isPreCombat, round, currentTurn, APL, name}) => {
+    const updatedEncounters = encounters.map(enc =>
+      enc.id === id ? { 
+        ...enc,
+        name: name !== undefined ? name : enc.name, 
+        combatants: combatants !== undefined ? combatants : enc.combatants, 
+        isPreCombat: isPreCombat !== undefined ? isPreCombat : enc.isPreCombat, 
+        round: round !== undefined ? round : enc.round, 
+        currentTurn: currentTurn !== undefined ? currentTurn : enc.currentTurn, 
+        APL : APL !== undefined ? APL : enc.APL
+      } : enc
+    )
+    setEncounters(updatedEncounters);
   };
 
   const deleteEncounter = (id) => {
