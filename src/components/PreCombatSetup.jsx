@@ -291,7 +291,8 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                 <button onClick={handleMultipleAddToLibrary} style={{ marginLeft: '10px' }}>Add to Library</button>
             </div>
             <div className='precombat-combatant-container' ref={checkboxContainerRef}>
-                {combatants.map((combatant, index) => (
+
+                {!combatants.length ? <div style={{width:'100%', textAlign:'center', margin:'15px'}}>Add Combatants to the Ecounter</div> : combatants.map((combatant, index) => (
                     <div key={combatant.id} className='precombat-combatant'>
                         <div className='precombat-combatant-name'>
                             <div className='precombat-combatant-name-inner'>

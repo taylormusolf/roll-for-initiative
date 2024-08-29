@@ -9,6 +9,8 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
   const [selectedBestiary, setSelectedBestiary] = useState(null);
   const [selectedName, setSelectedName] = useState(null);
   const [statblock, setStatblock] = useState(null);
+  const [search, setSearch] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
   const scrollRef = useRef(null);
 
 
@@ -19,6 +21,23 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
       });
     }
   }, [selectedBestiary, selectedName, statblock])
+
+  useEffect(()=> {
+    if(search.length){
+      if(currentView !== 'search') setCurrentView('search')
+      const matches = [];
+      Object.keys(monsters).forEach(bestiary => {
+        const filtered = monsters[bestiary].filter(item => item.toLowerCase().includes(search.toLowerCase()))
+        if(filtered.length){
+          matches.push([bestiary, filtered])
+        }
+      })
+      setSearchResults(matches);
+    } else {
+      setCurrentView('folders')
+    }
+  }, [search])
+
   const handleBestiaryClick = (bestiary) => {
     setSelectedBestiary(bestiary);
     setCurrentView('files');
@@ -28,6 +47,12 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
     setSelectedName(name);
     setCurrentView('preview');
   };
+
+  const handleSearchClick = (bestiary, name) => {
+    setSelectedBestiary(bestiary);
+    setSelectedName(name);
+    setCurrentView('preview');
+  }
 
   const handleBackClick = () => {
     if (currentView === 'preview') {
@@ -99,6 +124,15 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
     return arr.join(' ');
   }
 
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
+  }
+  const handleClearSearch = () => {
+    setSearch('');
+    setSearchResults([]);
+    setCurrentView('folders');
+  }
+
 
   return (
     <div className="monster-drawer open"  ref={scrollRef}>
@@ -106,7 +140,26 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
         <button onClick={closeDrawer}><FaWindowClose /></button>
         {currentView !== 'folders' && <button onClick={handleBackClick}>Back</button>}
         {currentView === 'preview' && selectedName && <button onClick={handleAddMonster}>Add NPC</button>}
+        {currentView !== 'preview' && <input type='text' style={{backgroundColor: 'var(--tan)', width:'200px'}} value={search} onChange={handleSearch}/>}
+        {currentView !== 'preview' && <button onClick={handleClearSearch}>Clear Search</button> }
       </div>
+      {currentView === 'search' &&
+        <div>
+          <h2>Search Results</h2>
+          {!searchResults.length ? <div> No Results </div>: <div>
+            {searchResults.map(([bestiary, mons], i)=> (
+              <div key={`${bestiary}-${i}`}>
+                <h3>{textParse(bestiary)}</h3>
+                  <div className='monster-drawer-name'> 
+                    {mons.map(mon => (
+                      <li key={`${mon}-${i}`} onClick={() => handleSearchClick(bestiary, mon)}>{textParse(mon)}</li>
+                    ))}
+                  </div>
+              </div>
+            ))}
+          </div>}
+        </div>
+      }
       {currentView === 'folders' && (
         <div className='monster-drawer-bestiary'>
           <h3>Select a Bestiary</h3>
