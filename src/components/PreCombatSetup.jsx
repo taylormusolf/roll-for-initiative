@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { generateRandomNumber } from '../util/random';
 import Modal from 'react-modal';
 import { useParams } from 'react-router-dom';
@@ -38,6 +38,9 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
 
     const [selectedCombatantIds, setSelectedCombatantIds] = useState([]);
     const [selectedLibraryIds, setSelectedLibraryIds] = useState([]);
+    const [selectAll, setSelectAll] = useState(true);
+
+    const checkboxContainerRef = useRef(null);
 
    
     const [warning, setWarning] = useState(false);
@@ -100,6 +103,25 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
         ))
         setCombatants(updatedCombatants);
     }
+    const handleSelectAll = () => {
+        const checkboxes = checkboxContainerRef.current.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+          checkbox.checked = selectAll;
+        });
+        if(selectAll){
+            setSelectedCombatantIds(combatants.map(combatant => Number(combatant.id)));
+        }else {
+            setSelectedCombatantIds([]);
+        }
+        setSelectAll(!selectAll);
+    };
+    const selectedInitiativeRoll = () => {
+        const updatedCombatants = combatants.map((combatant)=> (
+            selectedCombatantIds.includes(combatant.id) ? { ...combatant, 'initiative': generateRandomNumber(20, combatant.perception || 0) } : combatant
+        ))
+        setCombatants(updatedCombatants);
+    }
+
     const calculateEncounterRating = ()=> {
         let pcCount = 0;
         let xpCount = 0;
@@ -253,7 +275,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                     <button onClick={handleStart} disabled={combatants.length === 0}>
                         Start Encounter
                     </button>
-                    <button onClick={npcInitiativeRoll}>Roll Initiative for NPCs</button>
+                    {/* <button onClick={npcInitiativeRoll}>Roll Initiative for NPCs</button> */}
                 </div>
             </div>
             <div className='precombat-combatant-add-buttons'>
@@ -262,11 +284,13 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                 <button onClick={() => addCombatant(true)}>Add PC</button>
             </div>
             <div className='precombat-combatant-special-buttons'>
+                <button onClick={handleSelectAll} style={{ marginLeft: '10px' }}>{selectAll ? 'Select All' : "Unselect All"}</button>
+                <button onClick={selectedInitiativeRoll} style={{ marginLeft: '10px' }}>Roll Initiative</button>
                 <button onClick={handleRemoveCombatants} style={{ marginLeft: '10px' }}>Remove</button>
                 <button onClick={handleDupeCombatants} style={{ marginLeft: '10px' }}>Duplicate</button>
                 <button onClick={handleMultipleAddToLibrary} style={{ marginLeft: '10px' }}>Add to Library</button>
             </div>
-            <div className='precombat-combatant-container'>
+            <div className='precombat-combatant-container' ref={checkboxContainerRef}>
                 {combatants.map((combatant, index) => (
                     <div key={combatant.id} className='precombat-combatant'>
                         <div className='precombat-combatant-name'>
