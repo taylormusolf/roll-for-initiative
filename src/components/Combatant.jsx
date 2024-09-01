@@ -7,6 +7,7 @@ import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import './Combatant.scss'
 import data from '../assets/data/other.json'
 import { height } from '@fortawesome/free-regular-svg-icons/faAddressBook';
+import { replaceReferences } from '../util/parse';
 
 
 
@@ -129,16 +130,14 @@ const Combatant = ({
   isCurrent,
   moveUp,
   moveDown,
-  updateHealth,
-  updateTempHealth,
-  updateName,
-  updateConditions,
+  updateField,
   removeCombatant
 }) => {
   //modals
   const [conditionsModalIsOpen, setConditionsModalIsOpen] = useState(false);
   const [statBlockModalIsOpen, setStatBlockModalIsOpen] = useState(false);
   const [hpModalIsOpen, setHpModalIsOpen] = useState(false);
+  const [notesModalIsOpen, setNotesModalIsOpen] = useState(false);
   
   const [toggleAdditionalButtonsMenu, setToggleAdditionalButtonsMenu] = useState(false);
   
@@ -151,18 +150,18 @@ const Combatant = ({
     const updatedConditions = conditions.map((condition) =>
       condition.name === conditionName ? { ...condition, value } : condition
     );
-    updateConditions(id, updatedConditions);
+    updateField(id, 'conditions', updatedConditions);
   };
   const addCondition = () => {
     const conditionsWithValues = ['clumsy', 'doomed', 'drained', 'dying', 'frightened','enfeebled', 'persistant-damage', 'slowed', 'stunned','wounded,'];
     if(selectedCondition === 'custom'){
-      updateConditions(id, [...conditions, { name: customCondition, value: 0 }])
+      updateField(id, 'conditions', [...conditions, { name: customCondition, value: 0 }])
     }else {
-      updateConditions(id, [...conditions, { name: selectedCondition, value: conditionsWithValues.includes(selectedCondition) ? 1 : null }])
+      updateField(id, 'conditions', [...conditions, { name: selectedCondition, value: conditionsWithValues.includes(selectedCondition) ? 1 : null }])
     }
   }
   const removeCondition = (conditionName) => {
-    updateConditions(id, conditions.filter((condition) => condition.name !== conditionName));
+    updateField(id, 'conditions', conditions.filter((condition) => condition.name !== conditionName));
   }
 
   const handleConditionOptions = (e) => {
@@ -182,8 +181,9 @@ const Combatant = ({
         const url = `https://taylormusolf.com/pf2e/packs/conditions/${tooltipSubject}.json`
         fetch(url)
           .then(res => res.json())
-          .then(data => {
-            setTooltipContent(data.system.description.value);
+          .then(data => replaceReferences(data.system.description.value))
+          .then(parsed => {
+            setTooltipContent(parsed);
             setLoading(false);
           })
           .catch(err => {
@@ -214,7 +214,7 @@ const Combatant = ({
     const adjustment = parseInt(healthAdjustment, 10);
     if (!isNaN(adjustment)) {
       const newHealth = Math.min(maxHp, Math.max(0, hp + adjustment));
-      updateHealth(id, newHealth);
+      updateField(id, 'hp', newHealth);
     }
     setHealthAdjustment('');
   };
@@ -223,7 +223,7 @@ const Combatant = ({
     const adjustment = parseInt(tempHealthAdjustment, 10);
     if (!isNaN(adjustment)) {
       const newHealth = Math.min(maxHp, Math.max(0, tempHp + adjustment));
-      updateTempHealth(id, newHealth);
+      updateField(id, 'tempHp', newHealth);
     }
     setTempHealthAdjustment('');
   };
@@ -239,7 +239,7 @@ const Combatant = ({
             <input
               type="text"
               value={name}
-              onChange={(e) => updateName(id, e.target.value)}
+              onChange={(e) => updateField(id, 'name', e.target.value)}
               style={{ fontWeight: isCurrent ? 'bold' : 'normal', marginRight: '10px', width: '200px' }}
             />
           </div>
@@ -302,7 +302,7 @@ const Combatant = ({
                 {condition.value !== null ? ` (${condition.value})` : ''}
                 {showTooltip && (
                   <div className="conditions-tooltip">
-                    {loading ? 'Loading...' : tooltipContent}
+                    {loading ? 'Loading...' : <div dangerouslySetInnerHTML={{ __html: tooltipContent}}/>}
                   </div>
                 )}
               </span>
@@ -359,6 +359,20 @@ const Combatant = ({
             <button onClick={() => removeCombatant(id)} style={{ marginRight: '5px' }}>
               <IoCloseSharp />
             </button>
+            <button onClick={() => setNotesModalIsOpen(true)} style={{ marginRight: '5px' }}>
+              Notes
+            </button>
+            <Modal
+              isOpen={notesModalIsOpen}
+              onRequestClose={() => setNotesModalIsOpen(false)}
+              style={conditionsMenuStyles}
+              contentLabel="Notes"
+            >
+              <h2>Notes</h2>
+              <textarea value={notes} placeholder='Put character notes here' onChange={(e) => updateField(id, 'notes', e.target.value)}
+                style={{width: '100%', height: '50vh'}}
+              />
+            </Modal>
           </>
           <Modal
           isOpen={statBlockModalIsOpen}

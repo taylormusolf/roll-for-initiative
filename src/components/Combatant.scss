@@ -82,10 +82,11 @@
   }
 
   .conditions-tooltip {
+    font-family: 'FF Good Pro Cond';
     position: absolute;
-    background-color: #333;
-    color: #fff;
-    padding: 5px;
+    background-color: var(--tan);
+    padding: 10px;
     border-radius: 3px;
+    border: 2px solid var(--gold);
     z-index: 1000;
   }

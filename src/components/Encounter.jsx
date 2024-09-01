@@ -149,34 +149,41 @@ const Encounter = () => {
     }
   };
 
-  const updateHealth = (id, newHealth) => {
-    const newOrder = initiativeOrder.map(combatant =>
-      combatant.id === id ? { ...combatant, hp: newHealth } : combatant
+  const updateField = (id, field, newValue) => {
+    const update = initiativeOrder.map(combatant =>
+      combatant.id === id ? { ...combatant, [field]: newValue } : combatant
     );
-    handleDataChange(newOrder);
-  };
+    handleDataChange(update);
+  }
 
-  const updateTempHealth = (id, newHealth) => {
-    const newOrder = initiativeOrder.map(combatant =>
-      combatant.id === id ? { ...combatant, tempHp: newHealth } : combatant
-    );
-    handleDataChange(newOrder);
-  };
+  // const updateHealth = (id, newHealth) => {
+  //   const newOrder = initiativeOrder.map(combatant =>
+  //     combatant.id === id ? { ...combatant, hp: newHealth } : combatant
+  //   );
+  //   handleDataChange(newOrder);
+  // };
 
-  const updateName = (id, newName) => {
-    const newOrder = initiativeOrder.map(combatant =>
-      combatant.id === id ? { ...combatant, name: newName } : combatant
-    );
-    handleDataChange(newOrder);
-  };
+  // const updateTempHealth = (id, newHealth) => {
+  //   const newOrder = initiativeOrder.map(combatant =>
+  //     combatant.id === id ? { ...combatant, tempHp: newHealth } : combatant
+  //   );
+  //   handleDataChange(newOrder);
+  // };
 
-  const updateConditions = (id, conditions) => {
-    console.log(conditions)
-    const newOrder = initiativeOrder.map(combatant =>
-      combatant.id === id ? { ...combatant, conditions } : combatant
-    );
-    handleDataChange(newOrder);
-  };
+  // const updateName = (id, newName) => {
+  //   const newOrder = initiativeOrder.map(combatant =>
+  //     combatant.id === id ? { ...combatant, name: newName } : combatant
+  //   );
+  //   handleDataChange(newOrder);
+  // };
+
+  // const updateConditions = (id, conditions) => {
+  //   console.log(conditions)
+  //   const newOrder = initiativeOrder.map(combatant =>
+  //     combatant.id === id ? { ...combatant, conditions } : combatant
+  //   );
+  //   handleDataChange(newOrder);
+  // };
 
   const removeCombatant = (index) => {
     const updatedCombatants = initiativeOrder.filter((_, i) => i !== index);
@@ -256,10 +263,7 @@ const Encounter = () => {
                     isCurrent={index === currentTurn}
                     moveUp={moveUp}
                     moveDown={moveDown}
-                    updateHealth={updateHealth}
-                    updateTempHealth={updateTempHealth}
-                    updateName={updateName}
-                    updateConditions={updateConditions}
+                    updateField={updateField}
                     removeCombatant={() => removeCombatant(index)}
                   />
                 </div>

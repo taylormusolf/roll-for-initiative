@@ -131,7 +131,7 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                 pcCount++;
             } else {
                 const {cr} = combatant;
-                if(!cr) continue;
+                if(cr === undefined) continue;
                 let pAPL = APL ? parseInt(APL) : 0
                 switch (cr) {
                     case pAPL - 4:
@@ -315,8 +315,8 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                             {!combatant.isPC && 
                             <div className='precombat-combatant-stats'>
                                 
-                                <div className='precombat-combatant-cr'>{combatant.cr && `CR: ${combatant.cr}`}</div>
-                                <div>{combatant.cr && `(XP: ${calculateXP(combatant.cr)})`} </div>
+                                <div className='precombat-combatant-cr'>{combatant.cr !== undefined && `CR: ${combatant.cr}`}</div>
+                                <div>{combatant.cr !== undefined && `(XP: ${calculateXP(combatant.cr)})`} </div>
 
                             </div>
                             }

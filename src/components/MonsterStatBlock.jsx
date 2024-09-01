@@ -5,6 +5,7 @@ import a2 from '../assets/images/a2.png';
 import a3 from '../assets/images/a3.png';
 import af from '../assets/images/af.png';
 import ar from '../assets/images/ar.png';
+import { replaceReferences } from '../util/parse';
 
 
 
@@ -13,6 +14,9 @@ import ar from '../assets/images/ar.png';
 const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }) => {
     const [data, setData] = useState(block ? JSON.parse(block) : undefined);
     const [adjustment, setAdjustment] = useState('standard');
+    const [parsedPublicNotes, setParsedPublicNotes] = useState('');
+    const [parsedActionItemNotes, setParsedActionItemNotes] = useState([]);
+
     useEffect(()=> {
         if(!block){
             const url = `https://taylormusolf.com/pf2e/packs/${selectedBestiary}/${selectedName}.json`
@@ -24,27 +28,66 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
             setStatblock(data)
         }
     }, [data])
+    
+    useEffect(()=> {
+        if(data?.items){
+            const func = async function(){
+                const parsedActions = [];
+                const actionItems = items.filter(item => item.type === 'action');
+                actionItems.forEach(async (item, i) => {
+                    let res = await replaceReferences(item.system.description.value);
+                    parsedActions[i] = res;
+                })
+                setParsedActionItemNotes(parsedActions)
+            }
+            func();
+        }
+    }, [data])
+    
+    useEffect(()=> {
+        if(data?.system.details.publicNotes){
+            const func = async function(){
+                const res = await replaceReferences(data.system.details.publicNotes);
+                setParsedPublicNotes(res)
+            }
+            func();
+        }
+    }, [data])
+    
+    
     if(data === undefined) return null;
     const handleSelectAdjustment = (e) => {
         setAdjustment(e.target.value);
     }
-  const {
-    img,
-    name,
-    system: {
-      abilities,
-      attributes: { ac, hp, immunities, resistances, speed, allSaves, weaknesses, hardness },
-      details: { languages, level, publicNotes },
-      initiative,
-      perception,
-      resources: {focus},
-      saves: {fortitude, reflex, will},
-      skills,
-      traits: {rarity, size, value},
-      type
-    },
-    items,
-  } = data;
+    
+    const {
+        img,
+        name,
+        system: {
+            abilities,
+            attributes: { ac, hp, immunities, resistances, speed, allSaves, weaknesses, hardness },
+            details: { languages, level, publicNotes },
+            initiative,
+            perception,
+            resources: {focus},
+            saves: {fortitude, reflex, will},
+            skills,
+            traits: {rarity, size, value},
+            type
+        },
+        items,
+    } = data;
+
+    const rituals = items.filter(item => item.type === 'ritual');
+    const lores = items.filter(item => item.type === 'lore');
+    const weapons = items.filter(item => item.type === 'weapon');
+    const melees = items.filter(item => item.type === 'melee');
+    const actionItems = items.filter(item => item.type === 'action');
+    const spells = items.filter(item => item.type === 'spell');
+    const spellcastingEntry = items.filter(item => item.type === 'spellcastingEntry');
+
+
+
   function spellNumber(num){
     if(num === 1) return '1st';
     if(num === 2) return '2nd';
@@ -159,18 +202,20 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
         }
     }
   }
+  const handleReplaceText = (text) => {
+    let newText;
+    replaceReferences(text).then(res => {
+        newText = res
+    });
+    console.log(newText)
+    return newText;
+  }
 
   const ptagParse = (str) => {
     return str.replace(/<\/?p>/g, '');
   }
 
-  const rituals = items.filter(item => item.type === 'ritual');
-  const lores = items.filter(item => item.type === 'lore');
-  const weapons = items.filter(item => item.type === 'weapon');
-  const melees = items.filter(item => item.type === 'melee');
-  const actionItems = items.filter(item => item.type === 'action');
-  const spells = items.filter(item => item.type === 'spell');
-  const spellcastingEntry = items.filter(item => item.type === 'spellcastingEntry');
+ 
 
 
   return (
@@ -352,12 +397,12 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
                     )}
                 </div>}
                 <div className='actions'>
-                    {actionItems?.map((actionItem) => {
+                    {actionItems?.map((actionItem, i) => {
                         return (
                             <div className='action-item' key={actionItem._id}>
                                 <label>{actionItem.name}</label>
                                 {actionItem.system.actions.value !== 'passive' && <div><img src={actions(actionItem.system.actionType.value, actionItem.system.actions?.value)} alt="" /></div>}
-                                <div dangerouslySetInnerHTML={{ __html:actionItem.system.description.value}}></div>
+                                <div dangerouslySetInnerHTML={{ __html: parsedActionItemNotes[i]}}></div>
                             </div>
                         )
 
@@ -367,7 +412,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
         </div>
       <div className="notes">
         <label>Notes</label>
-        <p dangerouslySetInnerHTML={{ __html: publicNotes }}></p>
+        <p dangerouslySetInnerHTML={{ __html: parsedPublicNotes }}></p>
       </div>
     </div>
   );
