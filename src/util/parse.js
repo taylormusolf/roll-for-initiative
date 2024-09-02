@@ -1,6 +1,7 @@
 import DOMPurify from "dompurify";
 
 function fetchContentByUUID(uuid) {
+    // return uuid.split('.')[uuid.length - 1];
     const uuidContentMap = {
       "Compendium.pf2e.actionspf2e.Item.Delay": "<b>Delay</b>",
       "Compendium.pf2e.actionspf2e.Item.Ready": "<b>Ready</b>",
@@ -35,6 +36,8 @@ function fetchContentByUUID(uuid) {
       "Compendium.pf2e.conditionitems.Item.Slowed": "<b>Slowed</b>",
       "Compendium.pf2e.conditionitems.Item.Blinded": "<b>Blinded</b>",
       "Compendium.pf2e.conditionitems.Item.Prone": "<b>Prone</b>",
+      "Compendium.pf2e.conditionitems.Item.Stunned": "<b>Stunned</b>",
+
     };
     
     return uuidContentMap[uuid];
@@ -46,10 +49,30 @@ function fetchContentByCheck(check) {
     "flat|showDC:all|dc:5": "<b>DC 5 Flat Check</b>",
     "flat|showDC:all|dc:15": "<b>DC 15 Flat Check</b>",
     "flat|showDC:all|dc:resolve(5+@item.badge.value)" : "<b>Flat Check</b>",
-    "flat|showDC:all|dc:11|traits:secret" : "<b>DC 11 Flat Check</b>"
+    "flat|showDC:all|dc:11|traits:secret" : "<b>DC 11 Flat Check</b>",
+    "will|dc:28" : "<b>DC 28 Will Check</b>",
+    "reflex|dc:17|basic" : "<b>DC 17 basic Reflex</b>"
   };
   
   return checkContentMap[check];
+}
+
+function fetchContentByDamage(damage) {
+
+  const checkDamageMap = {
+      "3d6[electricity]": "3d6 electricity",
+  };
+  
+  return checkDamageMap[damage];
+}
+
+function fetchContentByTemplate(template) {
+
+  const checkTemplateMap = {
+      "emanation|distance:10": "10-foot emanation",
+  };
+  
+  return checkTemplateMap[template];
 }
 
 async function fetchLocalizedContent(localizeKey) {
@@ -72,7 +95,7 @@ export const replaceReferences = async (string) => {
     const purified = DOMPurify.sanitize(string);
     const replacements = [];
 
-    purified.replace(/@UUID\[(.*?)\](?:{(.*?)})?|@Localize\[(.*?)\]?|@Check\[(.*?)\]/g, (match, uuid, displayText, localizeKey, check) => {
+    purified.replace(/@UUID\[(.*?)\](?:{(.*?)})?|@Localize\[(.*?)\]|@Check\[(.*?)\]|@Damage\[([^\[\]]*(?:\[[^\[\]]*\])?[^\[\]]*)\]|@Template\[(.*?)\]/g, (match, uuid, displayText, localizeKey, check, damage, template) => {
       let replacementPromise;
       if (localizeKey) {
         // Handle @Localize references by making an API fetch
@@ -87,15 +110,27 @@ export const replaceReferences = async (string) => {
             match,
             replacement: displayText,
           });
+        } else {
+          replacementPromise = Promise.resolve({
+            match,
+            replacement: fetchContentByUUID(uuid) || match,
+          });
         }
-        replacementPromise = Promise.resolve({
-          match,
-          replacement: fetchContentByUUID(uuid) || match,
-        });
       } else if(check){
         replacementPromise = Promise.resolve({
           match,
           replacement: fetchContentByCheck(check) || match,
+        });
+      } else if(damage){
+
+        replacementPromise = Promise.resolve({
+          match,
+          replacement: fetchContentByDamage(damage) || match,
+        });
+      } else if(template){
+        replacementPromise = Promise.resolve({
+          match,
+          replacement: fetchContentByTemplate(template) || match,
         });
       }
       if (replacementPromise) {
