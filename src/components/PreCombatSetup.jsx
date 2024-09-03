@@ -284,11 +284,11 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                 <button onClick={() => addCombatant(true)}>Add PC</button>
             </div>
             <div className='precombat-combatant-special-buttons'>
-                <button onClick={handleSelectAll} style={{ marginLeft: '10px' }}>{selectAll ? 'Select All' : "Unselect All"}</button>
-                <button onClick={selectedInitiativeRoll} style={{ marginLeft: '10px' }}>Roll Initiative</button>
-                <button onClick={handleRemoveCombatants} style={{ marginLeft: '10px' }}>Remove</button>
-                <button onClick={handleDupeCombatants} style={{ marginLeft: '10px' }}>Duplicate</button>
-                <button onClick={handleMultipleAddToLibrary} style={{ marginLeft: '10px' }}>Add to Library</button>
+                <button className="blue" onClick={handleSelectAll} style={{ marginLeft: '10px' }}>{selectAll ? 'Select All' : "Unselect All"}</button>
+                <button className="blue" onClick={selectedInitiativeRoll} style={{ marginLeft: '10px' }}>Roll Initiative</button>
+                <button className="blue" onClick={handleRemoveCombatants} style={{ marginLeft: '10px' }}>Remove</button>
+                <button className="blue" onClick={handleDupeCombatants} style={{ marginLeft: '10px' }}>Duplicate</button>
+                <button className="blue" onClick={handleMultipleAddToLibrary} style={{ marginLeft: '10px' }}>Add to Library</button>
             </div>
             <div className='precombat-combatant-container' ref={checkboxContainerRef}>
 
