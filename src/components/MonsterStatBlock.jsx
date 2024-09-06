@@ -16,7 +16,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
     const [adjustment, setAdjustment] = useState('standard');
     const [parsedPublicNotes, setParsedPublicNotes] = useState('');
     const [parsedActionItemNotes, setParsedActionItemNotes] = useState([]);
-
+    console.log(parsedActionItemNotes)
     useEffect(()=> {
         if(!block){
             const url = `https://taylormusolf.com/pf2e/packs/${selectedBestiary}/${selectedName}.json`
@@ -201,14 +201,6 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
             return hp + 30;
         }
     }
-  }
-  const handleReplaceText = (text) => {
-    let newText;
-    replaceReferences(text).then(res => {
-        newText = res
-    });
-    console.log(newText)
-    return newText;
   }
 
   const ptagParse = (str) => {
@@ -402,6 +394,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
                             <div className='action-item' key={actionItem._id}>
                                 <label>{actionItem.name}</label>
                                 {actionItem.system.actions.value !== 'passive' && <div><img src={actions(actionItem.system.actionType.value, actionItem.system.actions?.value)} alt="" /></div>}
+                                {!!actionItem.system.traits.value.length && <div>{`(${actionItem.system.traits.value.join(', ')})`}</div>}
                                 <div dangerouslySetInnerHTML={{ __html: parsedActionItemNotes[i]}}></div>
                             </div>
                         )

@@ -76,15 +76,24 @@ function fetchContentByTemplate(template) {
 }
 
 async function fetchLocalizedContent(localizeKey) {
+  console.log(localizeKey)
+  const ref = {
+    'PF2E.NPC.Abilities.Glossary.AttackOfOpportunity': 'actions/reactive-strike.json',
+    'PF2E.NPC.Abilities.Glossary.Rend': '<p><b>Requirements</b> The monster hit the same enemy with two consecutive Strikes of the listed type in the same round; <b>Effect</b> The monster automatically deals that Strike\'s damage again to the enemy.</p>'
+  }
+  if(ref[localizeKey][0] === '<') return ref[localizeKey];
+
   try {
     // Make an API request to fetch the localized content based on the key
     // This is a placeholder and needs to be replaced with your actual API fetch logic
-    const response = await fetch(`https://taylormusolf.com/pf2e/packs/${localizeKey}`);
+    const response = await fetch(`https://taylormusolf.com/pf2e/packs/${ref[localizeKey]}`);
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
     const data = await response.json();
-    return data.content; // Assuming the response contains the text under a 'content' key
+    //return replaceReferences(data.description.value)
+    console.log(data.system.description.value)
+    return data.system.description.value; // Assuming the response contains the text under a 'content' key
   } catch (error) {
     console.error("Error fetching localized content:", error);
     return null; // Return null if there's an error

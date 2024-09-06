@@ -60,7 +60,6 @@ const MonsterDrawer = ({ monsters, addMonster, closeDrawer }) => {
 
   const handleBackClick = () => {
     const previous = navigationStack.pop();
-    console.log(previous)
     if (previous === 'npc-names-view') {
       setCurrentView('npc-names-view');
       setSelectedName(null);
