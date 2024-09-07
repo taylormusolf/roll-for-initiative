@@ -66,7 +66,8 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
         system: {
             abilities,
             attributes: { ac, hp, immunities, resistances, speed, allSaves, weaknesses, hardness },
-            details: { languages, level, publicNotes },
+            details,
+            details: { languages, level, publicNotes},
             initiative,
             perception,
             resources: {focus},
@@ -233,6 +234,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
                     return <div className='traits-misc' key={t} >{t.toUpperCase()}</div>
                 })}
             </div>
+            {!!details?.blurb && <div>{details?.blurb}</div>}
             {!!perception && <div className="perception">
                 <label>Perception</label>
                 <div>{`+${skillAdjustment(perception?.mod)};`}</div>
@@ -311,11 +313,11 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
             </div>
             <div className="defense-second-line">
                 <div>
-                    {hardness?.value ? 
-                        <div><label>HP</label>{`${hpAdjustment(hp.max, level.value)}; `} <label>Hardness:</label>{`${hardness.value}`} </div>
-                    :
-                        <div><label>HP</label>{`${hpAdjustment(hp.max, level.value)}; `}</div>
-                    }
+                    <label>HP</label>{`${hpAdjustment(hp.max, level.value)}; `}
+                    {!!hp?.details && <div>{`${hp.details}`}</div>}
+
+                    {hardness?.value && 
+                        <div> <label>Hardness:</label>{`${hardness.value}`} </div>}
 
                 </div>    
                 {!!immunities?.length && <div className="immunities">
@@ -362,13 +364,14 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
                             <div key={index}>
                                 <div className='melee-item'>
                                     <label>Melee <img src={actions(1)} alt="" /></label>
-                                    <p>
-                                        {[melee.name.toLowerCase(), `+${skillAdjustment(melee.system.bonus.value)}`].join(' ')
+                                    <div>{[melee.name.toLowerCase(), `+${skillAdjustment(melee.system.bonus.value)}`].join(' ')}</div>
+                                    {!!melee.system.traits.value.length && <p>
+                                        {[]
                                         .concat([' ('])
                                         .concat(melee.system.traits.value?.map(trait => trait.split('-').join(' ')).join(', '))
                                         .concat(['), '])
                                     }
-                                    </p>
+                                    </p>}
                                     <label>Damage</label>
                                     {Object.values(damageRolls)?.map((damageRoll, index) => 
                                         <div key={index}>{`${damageRoll.damage}${adjustment === 'weak' ? '-2' : adjustment === 'elite' ? '+2' : ''} ${damageRoll.damageType}`}</div>
@@ -391,12 +394,14 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
                 <div className='actions'>
                     {actionItems?.map((actionItem, i) => {
                         return (
-                            <div className='action-item' key={actionItem._id}>
-                                <label>{actionItem.name}</label>
-                                {actionItem.system.actionType.value !== 'passive' && <div><img src={actions(actionItem.system.actionType.value, actionItem.system.actions?.value)} alt="" /></div>}
-                                {!!actionItem.system.traits.value.length && <div>{`(${actionItem.system.traits.value.join(', ')})`}</div>}
-                                <div dangerouslySetInnerHTML={{ __html: parsedActionItemNotes[i]}}></div>
-                            </div>
+                            <>
+                                <div className='action-item' key={actionItem._id}>
+                                    <label>{actionItem.name}</label>
+                                    {actionItem.system.actionType.value !== 'passive' && <div><img src={actions(actionItem.system.actionType.value, actionItem.system.actions?.value)} alt="" /></div>}
+                                    {!!actionItem.system.traits.value.length && <div>{`(${actionItem.system.traits.value.join(', ')})`}</div>}
+                                </div>
+                                <div className='action-item-notes' dangerouslySetInnerHTML={{ __html: parsedActionItemNotes[i]}}></div>
+                            </>
                         )
 
                     })}

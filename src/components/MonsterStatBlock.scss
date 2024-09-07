@@ -28,9 +28,13 @@
     border-bottom: 1px solid;
   }
 
-  .adjustment-container, .perception, .knowledge, .languages, .skills, .abilities-list div, .items, .defense-top-line li, .defense-second-line div, .immunities, .resistances, .weaknesses, .speed{
+  .adjustment-container, .perception, .knowledge, .languages, .skills, .items, .defense-top-line li, .defense-second-line div, .immunities, .resistances, .weaknesses, .speed{
     display: flex;
     gap: 5px;
+  }
+  .abilities-list div{
+    display: flex;
+    gap: 2px;
   }
   
   .perception, .languages, .skills, .abilities-list, .traits, .special, .resistances, .defense-top-line, .weaknesses, .offense, .defense-second-line{
@@ -92,6 +96,14 @@
   flex-wrap: wrap;
   gap: 5px;
 }
+.action-item-notes{
+  padding-left: 10px;
+  display: block;
+  // white-space: nowrap;
+}
 .notes, .action-item{
   padding-top: 5px;
+}
+.notes p{
+  padding-left: 5px;
 }
