@@ -79,7 +79,7 @@ async function fetchLocalizedContent(localizeKey) {
   console.log(localizeKey)
   const ref = {
     'PF2E.NPC.Abilities.Glossary.AttackOfOpportunity': 'actions/reactive-strike.json',
-    'PF2E.NPC.Abilities.Glossary.Rend': '<p><b>Requirements</b> The monster hit the same enemy with two consecutive Strikes of the listed type in the same round; <b>Effect</b> The monster automatically deals that Strike\'s damage again to the enemy.</p>'
+    'PF2E.NPC.Abilities.Glossary.Rend': '<p><strong>Requirements</strong> The monster hit the same enemy with two consecutive Strikes of the listed type in the same round; <strong>Effect</strong> The monster automatically deals that Strike\'s damage again to the enemy.</p>'
   }
   if(ref[localizeKey][0] === '<') return ref[localizeKey];
 

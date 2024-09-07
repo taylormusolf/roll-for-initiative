@@ -393,7 +393,7 @@ const MonsterStatBlock = ({selectedBestiary, selectedName, setStatblock, block }
                         return (
                             <div className='action-item' key={actionItem._id}>
                                 <label>{actionItem.name}</label>
-                                {actionItem.system.actions.value !== 'passive' && <div><img src={actions(actionItem.system.actionType.value, actionItem.system.actions?.value)} alt="" /></div>}
+                                {actionItem.system.actionType.value !== 'passive' && <div><img src={actions(actionItem.system.actionType.value, actionItem.system.actions?.value)} alt="" /></div>}
                                 {!!actionItem.system.traits.value.length && <div>{`(${actionItem.system.traits.value.join(', ')})`}</div>}
                                 <div dangerouslySetInnerHTML={{ __html: parsedActionItemNotes[i]}}></div>
                             </div>
