@@ -5,6 +5,7 @@ import Encounter from './components/Encounter';
 import EncounterManager from './components/EncounterManager';
 import EncounterProvider from './context/EncounterContext';
 import CombatantLibraryProvider from './context/CombatantLibraryContext';
+import CriticalProvider from './context/CriticalContext';
 import CombatantLibrary from './components/CombatantLibrary';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -16,23 +17,25 @@ import Footer from './components/Footer';
 const App = () => (
   <EncounterProvider>
     <CombatantLibraryProvider>
-      <div className='app-container'>
-        <header className='navbar'>
-          <Navbar />
-        </header>
-        <main className='content'>
-          <Router basename='/roll-for-initiative'>
-              <Routes>
-                <Route path="/" exact element={<EncounterManager/>} />
-                <Route path="/encounter/:id" element={<Encounter/>} />
-                <Route path="/library" element={<CombatantLibrary/>} />
-              </Routes>
-          </Router>
-        </main>
-        <footer className='footer'>
-          <Footer />
-        </footer>
-      </div>
+      <CriticalProvider>
+        <div className='app-container'>
+          <header className='navbar'>
+            <Navbar />
+          </header>
+          <main className='content'>
+            <Router basename='/roll-for-initiative'>
+                <Routes>
+                  <Route path="/" exact element={<EncounterManager/>} />
+                  <Route path="/encounter/:id" element={<Encounter/>} />
+                  <Route path="/library" element={<CombatantLibrary/>} />
+                </Routes>
+            </Router>
+          </main>
+          <footer className='footer'>
+            <Footer />
+          </footer>
+        </div>
+      </CriticalProvider>
     </CombatantLibraryProvider>
   </EncounterProvider>
 );
