@@ -1,4 +1,4 @@
-export const generateRandomNumber = (diceSize, mod) => {
+export const generateRandomNumber = (diceSize, mod=0) => {
     return Math.floor(Math.random() * diceSize) + 1 + mod;
 }
 

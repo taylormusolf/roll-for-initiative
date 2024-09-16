@@ -1,33 +1,13 @@
 import React, { useState, useContext, useEffect, useRef } from 'react';
-import { generateRandomNumber } from '../util/random';
 import Modal from 'react-modal';
 import { useParams } from 'react-router-dom';
 import { EncounterContext } from '../context/EncounterContext';
 import MonsterDrawer from './MonsterDrawer';
 import monsters from '../assets/data/monsters.json'
-import { generateRandomID } from '../util/random';
+import { generateRandomNumber, generateRandomID } from '../util/random';
 import './PreCombatSetup.scss'
 
 Modal.setAppElement('#root');
-
-const combatantMenuStyles = {
-    content: {
-      top: '50%',
-      left: '50%',
-      right: 'auto',
-      bottom: 'auto',
-      marginRight: '-50%',
-      transform: 'translate(-50%, -50%)',
-      padding: '20px',
-      borderRadius: '5px',
-      width: '300px',
-      backgroundColor: 'var(--tan)',
-      fontFamily: 'Taroca'
-    },
-    overlay: {
-      backgroundColor: 'rgba(0, 0, 0, 0.10)',
-    },
-  };
 
 const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatant, updateCombatants, dupeCombatants, handleAddtoLibrary, libraryCombatants, handleRemoveFromLibrary, round, currentTurn, APL, setAPL, CR, setCR, XP, setXP }) => {
     const { id } = useParams();
@@ -324,8 +304,9 @@ const PreCombatSetup = ({ combatants, setCombatants, setIsPreCombat, addCombatan
                         <Modal
                             isOpen={showCombatantMenu}
                             onRequestClose={() => setShowCombatantMenu(false)}
-                            style={combatantMenuStyles}
                             contentLabel="combatant-menu"
+                            className="modal"
+                            overlayClassName="modal-overlay"
                         >
                             <div className='combatant-setup-modal'>
                                 <input

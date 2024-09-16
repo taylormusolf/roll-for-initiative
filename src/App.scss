@@ -121,3 +121,27 @@
   bottom: 0;
   width: 100vw;
 }
+
+.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  transform: translate(-50%, -50%);
+  background-color: var(--tan);
+  padding: 20px;
+  border-radius: 5px;
+  width: 600px;
+  border: 2px solid var(--gold);
+  font-family: 'Taroca';
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.10);
+}

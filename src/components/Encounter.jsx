@@ -8,6 +8,7 @@ import Combatant from './Combatant';
 import PreCombatSetup from './PreCombatSetup';
 import './Encounter.scss'
 import { BsChevronDoubleDown } from "react-icons/bs";
+import CriticalCard from './CriticalCard'
 
 const Encounter = () => {
   const { id } = useParams();
@@ -206,6 +207,7 @@ const Encounter = () => {
     <div className='encounter-container'>
       <div className='encounter-buttons'>
         <Link to="/"><button>Back to Manager</button></Link>
+        <CriticalCard />
         {!isPreCombat && <button onClick={endEncounter}>Edit Encounter</button>}
         {/* <button onClick={addCombatant}>Add Combatant</button> */}
       </div>
@@ -239,7 +241,6 @@ const Encounter = () => {
       ): (
         <div>
           <h2>Round: {round}</h2>
-          
           <div className='encounter-combat-index'>
             {initiativeOrder.map((combatant, index) => {
               return(
