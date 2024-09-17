@@ -1,22 +1,32 @@
 import { useState, useContext } from "react";
 import { CriticalContext } from "../context/CriticalContext";
 import { generateRandomNumber } from '../util/random';
+import moment from 'moment';
 import Modal from 'react-modal';
+import { replaceReferences } from '../util/parse';
+import './CriticalCard.scss'
 
 Modal.setAppElement('#root');
 
 function CriticalCard(){
     //history of crits
-    const {critHistory, addCritToHistory, clearCriticalHistory} = useContext(CriticalContext);
+    const {critHistory, addCritToHistory, clearCritHistory} = useContext(CriticalContext);
     const [showCriticalModal, setShowCriticalModal] = useState(false);
     const [critCard, setCritCard] = useState(null)
 
-    console.log(critCard);
     const handleCrit= async(type) => { //critical-fumble-deck-1.json or critical-hit-deck-1.json
         const num = generateRandomNumber(53);
         const res = await fetch(`https://taylormusolf.com/pf2e/packs/criticaldeck/critical-${type}-deck-${num}.json`)
         const card = await res.json();
-        setCritCard(card.pages[0].text.content);
+        console.log(card)
+        console.log(card.pages[0].text.content)
+        let parsedCard = await(replaceReferences(card.pages[0].text.content))
+        addCritToHistory({type, date: Date.now(), card: parsedCard})
+        setCritCard(parsedCard);
+    }
+    const handleClearHistory = () => {
+        clearCritHistory()
+        setCritCard(null);
     }
 
     return(
@@ -29,18 +39,22 @@ function CriticalCard(){
                 className="modal"
                 overlayClassName="modal-overlay"
             >
-                <div>
-                    <div className="card">
-                        <div className="card-generation">
+                <div className="critcard-container">
+                    <div className="critcard">
+                        <div className="critcard-generation">
                             <button onClick={()=> handleCrit('hit')}>Critical Hit</button>
                             <button onClick={()=> handleCrit('fumble')}>Fumble</button>
                         </div>
-                        <div className="card-display"></div>
+                        <div className="critcard-display">
+                            <div dangerouslySetInnerHTML={{__html: critCard}}/>
+                        </div>
                     </div>
-                    <div className="card-history">
-                        {critHistory.map(crit => (
-                            <div>
-
+                    <div className="critcard-history">
+                        {!!critHistory.length && <button onClick={handleClearHistory}>Clear History</button>}
+                        {critHistory.map((crit, i) => (
+                            <div className='critcard-history-item' key={i} onClick={()=> setCritCard(crit.card)}>
+                                <div>{moment(crit.date).format("HH:mm:ss YYYY-MMM-DD")}</div>
+                                <div>{crit.type}</div>
                             </div>
                         ))}
                     </div>

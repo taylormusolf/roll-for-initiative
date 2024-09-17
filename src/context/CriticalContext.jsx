@@ -23,7 +23,7 @@ const CriticalProvider = ({ children }) => {
   }, [critHistory]);
 
   const addCritToHistory = (crit) => {
-    setCritHistory([...critHistory, crit]);
+    setCritHistory([crit, ...critHistory]);
   };
 
   const clearCritHistory = () => {

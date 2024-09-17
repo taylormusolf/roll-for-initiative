@@ -1,0 +1,52 @@
+.critcard-container{
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    min-height: 675px;
+}
+
+.critcard{
+    display: flex;
+    flex-direction: column;
+    max-width: 210px;
+    
+}
+.critcard-display{
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.critical-deck, .fumble-deck {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem; 
+}
+
+  
+.critical-deck p, .fumble-deck p {
+    // width: 50%;
+    margin: 0;
+    text-align: right;
+}
+
+.critical-deck h1 + blockquote, .fumble-deck h1 + blockquote {
+    border-left: 2px solid #ccc;
+}
+
+.critcard-history{
+    overflow-y: auto;
+    max-height: 650px;
+}
+
+.critcard-history-item{
+    font-size: .75rem;
+    display: flex;
+    gap: 5px;
+}
+
+.critcard-history-item:hover{
+    background-color: #ccc;
+    cursor: pointer;
+}
+  

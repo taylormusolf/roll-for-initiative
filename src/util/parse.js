@@ -1,7 +1,8 @@
 import DOMPurify from "dompurify";
 
 function fetchContentByUUID(uuid) {
-    // return uuid.split('.')[uuid.length - 1];
+    const arr = uuid.split('.');
+    return `<b>${arr[arr.length - 1]}</b>`;
     const uuidContentMap = {
       "Compendium.pf2e.actionspf2e.Item.Delay": "<b>Delay</b>",
       "Compendium.pf2e.actionspf2e.Item.Ready": "<b>Ready</b>",
@@ -37,6 +38,8 @@ function fetchContentByUUID(uuid) {
       "Compendium.pf2e.conditionitems.Item.Blinded": "<b>Blinded</b>",
       "Compendium.pf2e.conditionitems.Item.Prone": "<b>Prone</b>",
       "Compendium.pf2e.conditionitems.Item.Stunned": "<b>Stunned</b>",
+      "Compendium.pf2e.conditionitems.Item.Fatigued": "<b>Fatigued</b>",
+      "Compendium.pf2e.conditionitems.Item.Invisible": "<b>Invisible</b>",
 
     };
     
@@ -51,19 +54,25 @@ function fetchContentByCheck(check) {
     "flat|showDC:all|dc:resolve(5+@item.badge.value)" : "<b>Flat Check</b>",
     "flat|showDC:all|dc:11|traits:secret" : "<b>DC 11 Flat Check</b>",
     "will|dc:28" : "<b>DC 28 Will Check</b>",
-    "reflex|dc:17|basic" : "<b>DC 17 basic Reflex</b>"
+    "reflex|dc:17|basic" : "<b>DC 17 basic Reflex</b>",
+    "reflex": "<b>Reflex Check</b>",
+    "fortitude": "<b>Fortitude Check</b>",
+    "will": "<b>Will Check</b>",
+    "flat|dc:5": "<b>DC 5 Flat Check</b>"
   };
   
   return checkContentMap[check];
 }
 
 function fetchContentByDamage(damage) {
-
-  const checkDamageMap = {
-      "3d6[electricity]": "3d6 electricity",
-  };
+  const arr = damage.split("[").join(' ').split(']').join('');
+  console.log(arr)
+  return arr;
+  // const checkDamageMap = {
+  //     "3d6[electricity]": "3d6 electricity",
+  // };
   
-  return checkDamageMap[damage];
+  // return checkDamageMap[damage];
 }
 
 function fetchContentByTemplate(template) {
@@ -78,6 +87,7 @@ function fetchContentByTemplate(template) {
 async function fetchLocalizedContent(localizeKey) {
   console.log(localizeKey)
   const ref = {
+    'PF2E.PersistentDamage.Bleed1.success': '<strong>1 persistent bleed damage</strong>',
     'PF2E.NPC.Abilities.Glossary.AttackOfOpportunity': 'actions/reactive-strike.json',
     'PF2E.NPC.Abilities.Glossary.Rend': '<p><strong>Requirements</strong> The monster hit the same enemy with two consecutive Strikes of the listed type in the same round; <strong>Effect</strong> The monster automatically deals that Strike\'s damage again to the enemy.</p>'
   }
