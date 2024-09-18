@@ -207,7 +207,7 @@ const Encounter = () => {
     <div className='encounter-container'>
       <div className='encounter-buttons'>
         <Link to="/"><button>Back to Manager</button></Link>
-        <CriticalCard />
+        {!isPreCombat &&<CriticalCard />}
         {!isPreCombat && <button onClick={endEncounter}>Edit Encounter</button>}
         {/* <button onClick={addCombatant}>Add Combatant</button> */}
       </div>

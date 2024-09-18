@@ -18,8 +18,6 @@ function CriticalCard(){
         const num = generateRandomNumber(53);
         const res = await fetch(`https://taylormusolf.com/pf2e/packs/criticaldeck/critical-${type}-deck-${num}.json`)
         const card = await res.json();
-        console.log(card)
-        console.log(card.pages[0].text.content)
         let parsedCard = await(replaceReferences(card.pages[0].text.content))
         addCritToHistory({type, date: Date.now(), card: parsedCard})
         setCritCard(parsedCard);
