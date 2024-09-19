@@ -19,7 +19,7 @@ function CriticalCard(){
         const res = await fetch(`https://taylormusolf.com/pf2e/packs/criticaldeck/critical-${type}-deck-${num}.json`)
         const card = await res.json();
         let parsedCard = await(replaceReferences(card.pages[0].text.content))
-        addCritToHistory({type, date: Date.now(), card: parsedCard})
+        addCritToHistory({type, date: Date.now(), card: parsedCard, num})
         setCritCard(parsedCard);
     }
     const handleClearHistory = () => {
@@ -48,11 +48,11 @@ function CriticalCard(){
                         </div>
                     </div>
                     <div className="critcard-history">
-                        {!!critHistory.length && <button onClick={handleClearHistory}>Clear History</button>}
+                        <button onClick={handleClearHistory}>Clear History</button>
                         {critHistory.map((crit, i) => (
                             <div className='critcard-history-item' key={i} onClick={()=> setCritCard(crit.card)}>
                                 <div>{moment(crit.date).format("HH:mm:ss YYYY-MMM-DD")}</div>
-                                <div>{crit.type}</div>
+                                <div>{crit.type} #{crit.num}</div>
                             </div>
                         ))}
                     </div>
