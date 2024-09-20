@@ -29,7 +29,7 @@ function CriticalCard(){
 
     return(
         <>
-            <button onClick={() =>setShowCriticalModal(true)}>Crits</button>
+            <button className='crit-button' onClick={() =>setShowCriticalModal(true)}>Crits</button>
             <Modal
                 isOpen={showCriticalModal}
                 onRequestClose={() => setShowCriticalModal(false)}

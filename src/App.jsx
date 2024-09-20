@@ -7,6 +7,7 @@ import EncounterProvider from './context/EncounterContext';
 import CombatantLibraryProvider from './context/CombatantLibraryContext';
 import CriticalProvider from './context/CriticalContext';
 import CombatantLibrary from './components/CombatantLibrary';
+
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
