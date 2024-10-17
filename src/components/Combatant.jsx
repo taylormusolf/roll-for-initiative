@@ -138,6 +138,8 @@ const Combatant = ({
   const [statBlockModalIsOpen, setStatBlockModalIsOpen] = useState(false);
   const [hpModalIsOpen, setHpModalIsOpen] = useState(false);
   const [notesModalIsOpen, setNotesModalIsOpen] = useState(false);
+  const [removeCombatantModalIsOpen, setRemoveCombatantModalIsOpen] = useState(false);
+
   
   const [toggleAdditionalButtonsMenu, setToggleAdditionalButtonsMenu] = useState(false);
   
@@ -230,6 +232,7 @@ const Combatant = ({
 
 
   const styleToUse = isPC ? pcStyle : npcStyle;
+
   return (
     <div className='e-combatant-container' style={{ ...styleToUse}}>
       <div className='e-combatant-sections-container'style={{display:'flex', alignItems:'center', justifyContent: 'space-between', width: '100%'}}>
@@ -309,6 +312,8 @@ const Combatant = ({
             ))}
           </div>
         </div>
+        <button onClick={() => moveUp(id)} style={{ marginRight: '5px' }}><FaArrowUp /></button>
+        <button onClick={() => moveDown(id)} style={{ marginRight: '5px' }}><FaArrowDown /></button>
         <button onClick={()=> setToggleAdditionalButtonsMenu(!toggleAdditionalButtonsMenu)}>{toggleAdditionalButtonsMenu ? <FaChevronUp /> : <FaChevronDown />}</button>
       </div>
         <Modal
@@ -350,13 +355,7 @@ const Combatant = ({
         {toggleAdditionalButtonsMenu && (<div>
           <>
             {stats && (<button onClick={() => setStatBlockModalIsOpen(true)}>SB</button>)}
-            <button onClick={() => moveUp(id)} style={{ marginRight: '5px' }}>
-              <FaArrowUp />
-            </button>
-            <button onClick={() => moveDown(id)} style={{ marginRight: '5px' }}>
-              <FaArrowDown />
-            </button>
-            <button onClick={() => removeCombatant(id)} style={{ marginRight: '5px' }}>
+            <button onClick={() => setRemoveCombatantModalIsOpen(true)} style={{ marginRight: '5px' }}>
               <IoCloseSharp />
             </button>
             <button onClick={() => setNotesModalIsOpen(true)} style={{ marginRight: '5px' }}>
@@ -382,6 +381,16 @@ const Combatant = ({
           >
             <MonsterStatBlock block={stats}/>
             <button onClick={() => setStatBlockModalIsOpen(false)}>Close</button>
+          </Modal>
+          <Modal
+          isOpen={removeCombatantModalIsOpen}
+          onRequestClose={() => setRemoveCombatantModalIsOpen(false)}
+          style={conditionsMenuStyles}
+          contentLabel="Remove-combatant"
+          >
+            <p>{`Are you sure you want to permanently remove ${name} from the combat?`}</p>
+            <button onClick={() => removeCombatant(id)}>Yes</button>
+            <button onClick={() => setRemoveCombatantModalIsOpen(false)}>No</button>
           </Modal>
       </div>)}
     </div>
