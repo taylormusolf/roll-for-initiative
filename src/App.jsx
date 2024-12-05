@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.scss';
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes} from 'react-router-dom';
 import Encounter from './components/Encounter';
 import EncounterManager from './components/EncounterManager';
 import EncounterProvider from './context/EncounterContext';
